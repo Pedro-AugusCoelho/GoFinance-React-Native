@@ -98,16 +98,16 @@ export function Dashboard() {
             month: 'long',
         })
 
-        const Interval = `01 a ${lastTransactionsExpensives}`
+        const Interval = lastTransactionsExpensives === 'Invalid Date' ? 'Não possui nenhum lançamento' : `01 a ${lastTransactionsExpensives}`
 
         setHighlightData({
             entries:{
                 total: Number(entriesTotal).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}),
-                lastTransaction:'Última entrada dia ' +  String(lastTransactionsEntries)
+                lastTransaction: lastTransactionsEntries === 'Invalid Date' ? 'Não possui nenhum lançamento' : `Última entrada dia ${String(lastTransactionsEntries)}`
             },
             expensive:{
                 total: Number(expensiveTotal).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}),
-                lastTransaction: 'Última saida dia ' + String(lastTransactionsExpensives)
+                lastTransaction: lastTransactionsExpensives === 'Invalid Date' ? 'Não possui nenhum lançamento' : `Última entrada dia ${String(lastTransactionsExpensives)}`
             },
             balance: {
                 total: Number(entriesTotal - expensiveTotal).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}),
@@ -140,9 +140,9 @@ export function Dashboard() {
                                 </S.UserWelcome>
                             </S.UserInfo>
 
-                            <S.LogoutBtn>
+                            {/* <S.LogoutBtn>
                                 <S.IconPower name="power" />
-                            </S.LogoutBtn>
+                            </S.LogoutBtn> */}
                         </S.UserWrapper>
                     </S.Header>
 
