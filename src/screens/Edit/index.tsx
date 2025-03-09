@@ -3,25 +3,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Yup from "yup";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Control, Controller, FieldValues, useForm } from "react-hook-form";
-import { Alert, Keyboard, Modal, TouchableWithoutFeedback } from "react-native";
+import { Alert, Keyboard, Modal, Platform, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 import { useRoute, useNavigation } from '@react-navigation/native';
 import * as R from './styles';
 import { CategorySelect } from "../CategorySelect";
 import { editRouteProp, propsStack } from "../../routes/stack.routes";
 import { DataListProps } from "../Dashboard";
 import { categories } from "../../../utils/categories";
-import { ScrollView } from "react-native-gesture-handler";
-
+import DateTimePicker from "@react-native-community/datetimepicker";
 interface FormData {
     name:string;
-    amount:string;
+    value:string;
 }
 
 const schema = Yup.object().shape({
     name: Yup
     .string()
     .required('Nome é obrigátorio'),
-    amount: Yup
+    value: Yup
     .number()
     .typeError('Informe um valor númerico')
     .positive('Informe somente valores positivos')
@@ -30,9 +29,13 @@ const schema = Yup.object().shape({
 
 export function Edit() {
     const navigation: propsStack = useNavigation()
+    
     const route = useRoute<editRouteProp>();
+    
     const { params } = route;
+    
     const dataKey = '@gofinances:transactions';
+    
     const {
         control,
         setValue,
@@ -52,6 +55,7 @@ export function Edit() {
         key: 'category',
         name: 'Categoria',
     });
+    const [showDatePicker, setShowDatePicker] = useState(false)
 
     useEffect(() => {
         async function handleFindParameter() {
@@ -64,7 +68,7 @@ export function Edit() {
              setId(params.id)
              setDate(new Date(located.date))
              setValue('name', located.name)
-             setValue('amount', String(located.amount))
+             setValue('value', String(located.value))
              setTransactionType(located.type)
              if (findCategory) {
                 setCategory({
@@ -100,7 +104,7 @@ export function Edit() {
         const editTransaction = {
             id: id,
             name: form.name,
-            amount: form.amount,
+            value: form.value,
             type: transactionType,
             category: category.key,
             date: date
@@ -174,7 +178,7 @@ export function Edit() {
                             { errors.name && <R.Error>{ errors.name.message }</R.Error> }
 
                             <Controller
-                                name='amount'
+                                name='value'
                                 control={formControll}
                                 render={({ field: { onChange, value} }) => (
                                     <R.Input
@@ -185,7 +189,28 @@ export function Edit() {
                                     />
                                 )}
                             />
-                            { errors.amount && <R.Error>{ errors.amount.message }</R.Error> }
+                            { errors.value && <R.Error>{ errors.value.message }</R.Error> }
+
+                            <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                                <R.Input
+                                    value={date ? date.toLocaleDateString('pt-BR') : date}
+                                    placeholder="Selecionar Data"
+                                    editable={false}
+                                />
+    
+                                {showDatePicker && (
+                                    <DateTimePicker
+                                        value={date}
+                                        mode="date"
+                                        display="default"
+                                        onChange={(event, selectedDate) => {
+                                            const currentDate = selectedDate || date
+                                            setShowDatePicker(Platform.OS === 'ios')
+                                            setDate(currentDate)
+                                        }}
+                                    />
+                                )}
+                            </TouchableOpacity>
 
                             <R.BoxBtn>
                                 <R.BtnSelected onPress={() => setTransactionType('income')} isActive={transactionType === 'income'} type={transactionType}>

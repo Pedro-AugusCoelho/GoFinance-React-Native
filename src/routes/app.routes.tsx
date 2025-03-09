@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme } from "styled-components";
 import { Platform } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
-import { createBottomTabNavigator, BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const {Navigator, Screen} = createBottomTabNavigator();
 

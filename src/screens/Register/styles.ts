@@ -18,6 +18,8 @@ export const Container = styled.View`
     background-color: ${(props) => props.theme.colors.background};
 `;
 
+export const ScrollView = styled.ScrollView``;
+
 export const Header = styled.View`
     width: 100%;
     height: ${RFValue(115)}px;
@@ -44,8 +46,8 @@ export const InputContainer = styled.View`
 `;
 
 export const Input = styled.TextInput`
-    height: ${RFValue(55)}px;
-    padding: ${RFValue(16)}px;
+    height: ${RFValue(50)}px;
+    padding: ${RFValue(10)}px;
     margin-bottom: ${RFValue(10)}px;
     background-color: ${(props) => props.theme.colors.shape};
     border-radius: 5px;
@@ -104,7 +106,8 @@ export const Footer = styled.View`
 export const BtnSubmit = styled(RectButton)`
     width: 100%;
     align-items: center;
-    padding: ${RFValue(15)}px;
+    margin-top: ${RFValue(15)}px;
+    padding: ${RFValue(10)}px;
     border-radius: 5px;
     background-color: ${(props) => props.theme.colors.secodary};
 `;

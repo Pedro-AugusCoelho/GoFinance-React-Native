@@ -8,6 +8,7 @@ export interface TransactionDataProps {
     id?: string;
     type: 'income' | 'outcome';
     name: string;
+    value: string;
     amount: string;
     category: string;
     date: string;
@@ -27,7 +28,7 @@ export function TransactionCard({ data, onPress }:TransactionCardProps) {
                 <T.Title>{data.name}</T.Title>
                 <T.Amount type={data.type}>
                     {data.type === 'outcome' && '- '}
-                    {data.amount}
+                    {data.value}
                 </T.Amount>
             </T.Header>
             

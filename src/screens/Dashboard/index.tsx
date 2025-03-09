@@ -5,16 +5,12 @@ import { useFocusEffect } from '@react-navigation/native';
 import * as S from './styles';
 import { HighlightCard } from "../../components/HighlightCard";
 import { TransactionCard } from "../../components/TransactionCard";
-import { TransactionDataProps } from "../../components/TransactionCard";
 import { ActivityIndicator } from "react-native";
 import { useTheme } from "styled-components";
 import { useNavigation } from '@react-navigation/native';
 import { propsStack } from "../../routes/stack.routes";
-
-
-export interface DataListProps extends TransactionDataProps {
-    id: string;
-}
+import { getTransactionsByMonth } from "../../storage/transaction/getTransactionByYearAndMonth";
+import { TransactionDTO } from "../../storage/transaction/TransactionStorageDTO";
 
 interface HighlightDataProps {
     total: string;
@@ -28,11 +24,12 @@ interface HighlightData {
 }
 
 export function Dashboard() {
-    const dataKey = '@gofinances:transactions';
     const navigation: propsStack = useNavigation();
     const theme = useTheme();
+    const [filterDate, setFilterDate] = useState(['all', 'year', 'month', 'day'])
+    const [filterDateSelected, setFilterDateSelected] = useState('month')
     const [isLoading, setIsLoading] = useState(true);
-    const [data, setData] = useState<DataListProps[]>([]);
+    const [data, setData] = useState<TransactionDTO[]>([]);
     const [HighlightData , setHighlightData] = useState<HighlightData>({} as HighlightData);
 
     // async function removeAll() {
@@ -46,60 +43,61 @@ export function Dashboard() {
     }
 
     async function loadData() {
-        const response = await AsyncStorage.getItem(dataKey);
-        const transactions = response ? JSON.parse(response) : [];
+        const transactions = await getTransactionsByMonth()
         let entriesTotal = 0;
         let expensiveTotal = 0;
-
-        const transactionsFormatted: DataListProps[]  = transactions.map((item: DataListProps) => {
+    
+        const transactionsFormatted: TransactionDTO[] = transactions.map((item: TransactionDTO) => {
             if (item.type === 'income') {
-                entriesTotal += Number(item.amount)
+                entriesTotal += Number(item.value)
             } else {
-                expensiveTotal += Number(item.amount)
+                expensiveTotal += Number(item.value)
             }
-
-            const amount = Number(item.amount).toLocaleString('pt-BR', {
+    
+            const value = Number(item.value).toLocaleString('pt-BR', {
                 style: 'currency',
                 currency: 'BRL'
             })
-
+    
             const date = Intl.DateTimeFormat('pt-BR', {
                 day: '2-digit',
                 month: '2-digit',
                 year: '2-digit',
             }).format(new Date(item.date))
-
+    
             return {
                 id: item.id,
                 name: item.name,
                 type: item.type,
                 category: item.category,
-                amount,
+                value,
+                amount: item.value,
                 date,
             }
         })
+    
         setData(transactionsFormatted);
-
+    
         const lastTransactionsEntries = new Date(Math.max.apply(Math, 
-            transactions.filter((transaction: DataListProps) => transaction.type === 'income').map((item: DataListProps) => {
+            transactions.filter((transaction: TransactionDTO) => transaction.type === 'income').map((item: TransactionDTO) => {
                 return new Date(item.date).getTime()
             })    
         )).toLocaleDateString('pt-BR', {
             day: '2-digit',
             month: 'long',
         })
-
+    
         const lastTransactionsExpensives = new Date(Math.max.apply(Math, 
-            transactions.filter((transaction: DataListProps) => transaction.type === 'outcome').map((item: DataListProps) => {
+            transactions.filter((transaction: TransactionDTO) => transaction.type === 'outcome').map((item: TransactionDTO) => {
                 return new Date(item.date).getTime()
             })    
         )).toLocaleDateString('pt-BR', {
             day: '2-digit',
             month: 'long',
         })
-
+    
         const Interval = lastTransactionsExpensives === 'Invalid Date' ? 'Não possui nenhum lançamento' : `01 a ${lastTransactionsExpensives}`
-
+    
         setHighlightData({
             entries:{
                 total: Number(entriesTotal).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}),
@@ -116,6 +114,7 @@ export function Dashboard() {
         })
         setIsLoading(false);
     }
+    
 
     useFocusEffect(useCallback(() => {
         loadData();
@@ -180,7 +179,7 @@ export function Dashboard() {
                             keyExtractor={ item => item.id}
                             renderItem={({ item }) => <TransactionCard data={item} onPress={handleEditCard}/>}
                         />
-                    </S.Transactions>   
+                    </S.Transactions>
                 </>
             }
         </S.Container>

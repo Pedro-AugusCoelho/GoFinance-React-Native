@@ -20,6 +20,7 @@ interface ExpensivesData {
     type: 'income' | 'outcome';
     name: string;
     amount: string;
+    value: string;
     category: string;
     date: string;
 }
@@ -61,7 +62,7 @@ export function Resume() {
         );
 
         const expensivesTotal = expensives.reduce((acc: number, expensive: ExpensivesData) => {
-            return acc + Number(expensive.amount)
+            return acc + Number(expensive.value)
         },0);
 
         const totalByCategory: CategoryData[] = []
@@ -71,7 +72,7 @@ export function Resume() {
 
             expensives.forEach((expensives: ExpensivesData) => {
                 if (expensives.category === categories.key) {
-                    CategorySum += Number(expensives.amount)
+                    CategorySum += Number(expensives.value)
                 }
             })
 
