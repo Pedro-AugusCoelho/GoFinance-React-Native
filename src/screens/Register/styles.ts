@@ -85,6 +85,7 @@ export const BtnSelected = styled.TouchableOpacity<typeRegisterSelectedProps>`
    `}
 `;
 
+// @ts-ignore
 export const Icon = styled(Feather)<typeRegisterProps>`
     color: ${({theme, type}) => type === 'income' ? theme.colors.success : theme.colors.attention };
     font-size:${RFValue(24)}px;
@@ -103,6 +104,7 @@ export const Footer = styled.View`
     color: ${(props) => props.theme.colors.title};
 `;
 
+// @ts-ignore
 export const BtnSubmit = styled(RectButton)`
     width: 100%;
     align-items: center;
@@ -118,6 +120,7 @@ export const TextSubmit = styled.Text`
     color: ${(props) => props.theme.colors.shape};
 `;
 
+// @ts-ignore
 export const Category = styled(RectButton)`
     background-color: ${(props) => props.theme.colors.shape};
     width: 100%;
@@ -134,6 +137,7 @@ export const CategoryTitle = styled.Text`
     color: ${(props) => props.theme.colors.title};
 `;
 
+// @ts-ignore
 export const CategoryIcon = styled(Feather)`
     font-size:${RFValue(20)}px;
 `;

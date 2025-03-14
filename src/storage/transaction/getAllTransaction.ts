@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TRANSACTION_COLLECTION } from "../storageConfig";
-import { TransactionDTO } from "./TransactionStorageDTO";
+import { TransactionDTO } from "./transactionStorageDTO";
 
 
 export async function getAllTransactions() {

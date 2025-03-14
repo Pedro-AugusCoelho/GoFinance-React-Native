@@ -9,7 +9,16 @@ const {Navigator, Screen} = createBottomTabNavigator();
 import { Dashboard } from "../screens/Dashboard";
 import { Register } from "../screens/Register";
 import { Resume } from "../screens/Resume";
+import { Profile } from "../screens/Profile";
 import { TouchableOpacity } from "react-native";
+
+
+export type RootTabParamList = {
+    Listagem: undefined
+    Cadastrar: { idTransaction: number | null; action: string }
+    Resumo: undefined
+    perfil: undefined
+}
 
 export function BottomTabsRoutes () {
     const theme = useTheme();
@@ -20,7 +29,7 @@ export function BottomTabsRoutes () {
                 headerShown: false,
                 tabBarActiveTintColor: theme.colors.secodary,
                 tabBarInactiveTintColor:  theme.colors.text,
-                tabBarLabelPosition: 'beside-icon',
+                tabBarLabelPosition: 'below-icon',
                 tabBarStyle:{
                     height: 70,
                     paddingVertical: Platform.OS === 'ios' ? 20 : 0
@@ -65,6 +74,20 @@ export function BottomTabsRoutes () {
                     tabBarIcon: (({ size, color }) => 
                     <MaterialIcons
                         name="pie-chart"
+                        size={size}
+                        color={color}
+                    />
+                    )
+                }}
+            />
+
+            <Screen
+                name="Perfil"
+                component={Profile}
+                options={{
+                    tabBarIcon: (({ size, color }) => 
+                    <MaterialIcons
+                        name="person"
                         size={size}
                         color={color}
                     />

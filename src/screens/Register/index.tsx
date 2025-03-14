@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import uuid from 'react-native-uuid'
+import { RootTabParamList } from "../../routes/app.routes"
 import * as Yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Control, Controller, FieldValues, useForm } from "react-hook-form"
@@ -9,9 +10,9 @@ import { useNavigation } from '@react-navigation/native'
 
 import { CategorySelect } from "../CategorySelect"
 import * as R from './styles'
-import { propsBottomTab } from "../../routes/app.routes"
 
 import DateTimePicker from "@react-native-community/datetimepicker"
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs"
 
 interface FormData {
     name: string
@@ -19,6 +20,8 @@ interface FormData {
     amount: string
     date: Date
 }
+
+type TabNavigationProps = BottomTabNavigationProp<RootTabParamList>
 
 const schema = Yup.object().shape({
     name: Yup.string().required('Nome é obrigatório'),
@@ -33,14 +36,16 @@ const schema = Yup.object().shape({
 })
 
 export function Register() {
-    const navigation: propsBottomTab = useNavigation()
+    const navigation: TabNavigationProps = useNavigation()
     const dataKey = '@gofinances:transactions'
+    
     const {
         control,
         handleSubmit,
         reset,
         formState: { errors }
     } = useForm<FormData>({
+        // @ts-ignore
         resolver: yupResolver(schema),
         defaultValues: {
             amount: '1',
@@ -138,12 +143,16 @@ export function Register() {
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            {/* @ts-ignore */}
             <R.Container>
                 <R.Header>
+                    {/* @ts-ignore */}
                     <R.Title>Cadastro</R.Title>
                 </R.Header>
 
+                {/* @ts-ignore */}
                 <R.Body>
+                    {/* @ts-ignore */}
                     <R.InputContainer>
                         <Controller
                             name='name'
@@ -210,13 +219,15 @@ export function Register() {
                             )}
                         </TouchableOpacity>
                         
-
+                        {/* @ts-ignore */}
                         <R.BoxBtn>
+                            {/* @ts-ignore */}
                             <R.BtnSelected onPress={() => setTransactionType('income')} isActive={transactionType === 'income'} type={transactionType}>
                                 <R.Icon name='arrow-up-circle' type='income' />
                                 <R.TextBtn>Income</R.TextBtn>
                             </R.BtnSelected>
 
+                            {/* @ts-ignore */}
                             <R.BtnSelected onPress={() => setTransactionType('outcome')} isActive={transactionType === 'outcome'} type={transactionType}>
                                 <R.Icon name='arrow-down-circle' type='outcome' />
                                 <R.TextBtn>Outcome</R.TextBtn>

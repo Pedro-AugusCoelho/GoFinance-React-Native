@@ -1,5 +1,5 @@
 import { getAllTransactions } from "./getAllTransaction"
-import { TransactionDTO } from "./TransactionStorageDTO"
+import { TransactionDTO } from "./transactionStorageDTO"
 
 export async function getTransactionsByMonth(year?: number, month?: number) {
     try {

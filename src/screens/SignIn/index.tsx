@@ -1,31 +1,31 @@
 import React from "react";
 import * as S from './styles';
 
+import { useNavigation } from "@react-navigation/native";
+
 import LogoSvg from '../../assets/logo.svg';
 import { RFValue } from "react-native-responsive-fontsize";
 import { useAuth } from "../../hooks/auth";
 
-import { Control, Controller, FieldValues, useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Control, Controller, FieldValues, useForm } from "react-hook-form";
+import { propsStack } from "../../routes/stack.routes";
 
 const schema = Yup.object().shape({
-    email: Yup
+    name: Yup
     .string()
-    .required('Nome é obrigátorio'),
-    password: Yup
-    .string()
-    .required('Senha é obrigátoria')
+    .required('Nome é obrigátorio')
 })
 
 interface FormData {
-    email:string;
-    password:string;
+    name:string;
 }
 
 export function SignIn () {
+    const navigation: propsStack = useNavigation()
 
-    const { signIn } = useAuth();
+    const { createUser } = useAuth()
 
     const {
         control,
@@ -34,69 +34,62 @@ export function SignIn () {
         formState: { errors }
     } = useForm<FormData>({
         resolver: yupResolver(schema)
-    });
-    const formControll = control as unknown as Control<FieldValues, any>
+    })
+
+    const formControl = control as unknown as Control<FieldValues, any>
 
     function handleSignIn(form: FormData) {
-        signIn(form)
+        createUser(form)
+        navigation.navigate('Home')
     }
 
     return(
-        <S.Container>
-            <S.Header>
-                <S.TitleWrapper>
-                    <LogoSvg 
-                        width={RFValue(120)}
-                        height={RFValue(68)}
-                    /> 
+        <>
+            {/* @ts-ignore */}
+            <S.Container>
+                {/* @ts-ignore */}
+                <S.Header>
+                    {/* @ts-ignore */}
+                    <S.TitleWrapper>
+                        <LogoSvg 
+                            width={RFValue(120)}
+                            height={RFValue(68)}
+                        /> 
 
-                    <S.Title>Controle suas finanças de forma muito simples</S.Title>
-                </S.TitleWrapper>
+                        <S.Title>Controle suas finanças de forma muito simples</S.Title>
+                    </S.TitleWrapper>
 
-                <S.ContainerAccessInfo>
-                    <S.AccessInfo>Faça seu login com email e senha</S.AccessInfo>
-                </S.ContainerAccessInfo>
-            </S.Header>
+                    <S.ContainerAccessInfo>
+                        {/* @ts-ignore */}
+                        <S.AccessInfo>Acesse informando seu nome</S.AccessInfo>
+                    </S.ContainerAccessInfo>
+                </S.Header>
 
-            <S.Footer>
-                <S.Float>
-                    
-                    <Controller
-                        name='email'
-                        control={formControll}
-                        render={({ field: { onChange, value} }) => (
-                            <S.Input
-                                value={value}
-                                keyboardType="default"
-                                placeholder="Email"
-                                onChangeText={onChange}
-                                autoCapitalize='sentences'
-                                autoCorrect={false}
-                            />
-                        )}
-                    />
-
-                    <Controller
-                        name='password'
-                        control={formControll}
-                        render={({ field: { onChange, value} }) => (
-                            <S.Input
-                                value={value}
-                                keyboardType="default"
-                                secureTextEntry={true}
-                                placeholder="Senha"
-                                onChangeText={onChange}
-                                autoCapitalize='sentences'
-                                autoCorrect={false}
-                            />
-                        )}
-                    />
-                    
-                    <S.BtnSignIn onPress={handleSubmit(handleSignIn)}>
-                        <S.TitleSignIn>Entrar</S.TitleSignIn>
-                    </S.BtnSignIn>
-                </S.Float>
-            </S.Footer>
-        </S.Container>
+                <S.Footer>
+                    {/* @ts-ignore */}
+                    <S.Float>
+                        <Controller
+                            name='name'
+                            control={formControl}
+                            render={({ field: { onChange, value} }) => (
+                                <S.Input
+                                    value={value}
+                                    keyboardType="default"
+                                    placeholder="NOME"
+                                    onChangeText={onChange}
+                                    autoCapitalize='sentences'
+                                    autoCorrect={false}
+                                />
+                            )}
+                        />
+                        
+                        <S.BtnSignIn onPress={handleSubmit(handleSignIn)}>
+                            {/* @ts-ignore */}
+                            <S.TitleSignIn>Criar</S.TitleSignIn>
+                        </S.BtnSignIn>
+                    </S.Float>
+                </S.Footer>
+            </S.Container>
+        </>
     )
 }

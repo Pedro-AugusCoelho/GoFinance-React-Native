@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ListRenderItemInfo } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
 import * as S from './styles';
@@ -10,7 +10,7 @@ import { useTheme } from "styled-components";
 import { useNavigation } from '@react-navigation/native';
 import { propsStack } from "../../routes/stack.routes";
 import { getTransactionsByMonth } from "../../storage/transaction/getTransactionByYearAndMonth";
-import { TransactionDTO } from "../../storage/transaction/TransactionStorageDTO";
+import { TransactionDTO } from "../../storage/transaction/transactionStorageDTO";
 
 interface HighlightDataProps {
     total: string;
@@ -124,64 +124,74 @@ export function Dashboard() {
         loadData();
     },[]);
 
-    return(
-        <S.Container>
-            {
-                isLoading ? <S.LoadContainer><ActivityIndicator color={theme.colors.primary} size='large' /></S.LoadContainer> :
-                <>
-                    <S.Header>
-                        <S.UserWrapper>
-                            <S.UserInfo>
-                                <S.UserImage source={{ uri: 'https://github.com/Pedro-AugusCoelho.png'}} />
-                                <S.UserWelcome>
-                                    <S.WelcomeHello>Olá,</S.WelcomeHello>
-                                    <S.WelcomeName>Pedro Augusto C. C.</S.WelcomeName>
-                                </S.UserWelcome>
-                            </S.UserInfo>
+    if (isLoading) {
+        return(
+            <S.LoadContainer>
+                {/* @ts-ignore */}
+                <ActivityIndicator color={theme.colors.primary} size='large' />
+            </S.LoadContainer>
+        )
+    } else {
+        return (
+            <React.Fragment>
+                <S.Header>
+                    {/* @ts-ignore */}
+                    <S.UserWrapper>
+                        {/* @ts-ignore */}
+                        <S.UserInfo>
+                            <S.UserImage source={{ uri: 'https://github.com/Pedro-AugusCoelho.png'}} />
+                             {/* @ts-ignore */}
+                            <S.UserWelcome>
+                                <S.WelcomeHello>Olá,</S.WelcomeHello>
+                                <S.WelcomeName>Pedro Augusto C. C.</S.WelcomeName>
+                            </S.UserWelcome>
+                        </S.UserInfo>
+                    </S.UserWrapper>
+                </S.Header>
 
-                            {/* <S.LogoutBtn>
-                                <S.IconPower name="power" />
-                            </S.LogoutBtn> */}
-                        </S.UserWrapper>
-                    </S.Header>
+                {/* @ts-ignore */}
+                <S.HighlightCards>
+                    <HighlightCard 
+                        color={'success'}
+                        title='Entradas'
+                        amount={HighlightData.entries.total}
+                        lastTransaction={HighlightData.entries.lastTransaction}
+                        type="up"
+                    />
 
-                    <S.HighlightCards>
-                        <HighlightCard 
-                            color={'success'}
-                            title='Entradas'
-                            amount={HighlightData.entries.total}
-                            lastTransaction={HighlightData.entries.lastTransaction}
-                            type="up"
-                        />
+                    <HighlightCard
+                        color={'attention'}
+                        title='Saídas'
+                        amount={HighlightData.expensive.total}
+                        lastTransaction={HighlightData.expensive.lastTransaction}
+                        type="down"
+                    />
 
-                        <HighlightCard
-                            color={'attention'}
-                            title='Saídas'
-                            amount={HighlightData.expensive.total}
-                            lastTransaction={HighlightData.expensive.lastTransaction}
-                            type="down"
-                        />
+                    <HighlightCard 
+                        color={'shape'}
+                        title='Saldo'
+                        amount={HighlightData.balance.total}
+                        lastTransaction={HighlightData.balance.lastTransaction}
+                        type="total"
+                    />
+                </S.HighlightCards>
 
-                        <HighlightCard 
-                            color={'shape'}
-                            title='Saldo'
-                            amount={HighlightData.balance.total}
-                            lastTransaction={HighlightData.balance.lastTransaction}
-                            type="total"
-                        />
-                    </S.HighlightCards>
+                {/* @ts-ignore */}
+                <S.Transactions>
+                    <S.Title>Listagem</S.Title>
 
-                    <S.Transactions>
-                        <S.Title>Listagem</S.Title>
-
-                        <S.TransactionsList
-                            data={data}
-                            keyExtractor={ item => item.id}
-                            renderItem={({ item }) => <TransactionCard data={item} onPress={handleEditCard}/>}
-                        />
-                    </S.Transactions>
-                </>
-            }
-        </S.Container>
-    )
+                    <S.TransactionsList
+                        data={data}
+                        keyExtractor={(item: TransactionDTO) => String(item.id)}
+                        renderItem={({ item }: ListRenderItemInfo<TransactionDTO>) => (
+                            <TransactionCard
+                                data={item}
+                                onPress={handleEditCard}
+                            />
+                        )}
+                    />
+                </S.Transactions>
+            </React.Fragment>
+        )
+    }
 }

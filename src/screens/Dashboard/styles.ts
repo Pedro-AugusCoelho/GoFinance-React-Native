@@ -3,7 +3,6 @@ import { FlatList, FlatListProps } from "react-native";
 import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 import { Feather } from '@expo/vector-icons';
 import { getStatusBarHeight, getBottomSpace } from 'react-native-iphone-x-helper'
-import { DataListProps } from ".";
 import { BorderlessButton } from 'react-native-gesture-handler';
 
 export const LoadContainer = styled.View`
@@ -62,13 +61,13 @@ export const WelcomeHello = styled.Text`
     color: ${(props) => props.theme.colors.shape};
 `;
 
-export const LogoutBtn = styled(BorderlessButton)`
-    
-`;
+// @ts-ignore
+export const LogoutBtn = styled(BorderlessButton)``;
 
+// @ts-ignore
 export const IconPower = styled(Feather)`
-    color: ${(props) => props.theme.colors.secodary};
-    font-size: ${RFValue(24)}px;
+  color: ${({ theme }) => theme.colors.secodary};
+  font-size: ${RFValue(24)}px;
 `;
 
 export const HighlightCards = styled.ScrollView.attrs({
@@ -94,7 +93,8 @@ export const Title = styled.Text`
 `;
 
 export const TransactionsList = styled(
-    FlatList as new (props: FlatListProps<DataListProps>) => FlatList<DataListProps>
+    // @ts-ignore
+    FlatList as new (props: FlatListProps<TransactionDTO>) => FlatList<TransactionDTO>
     ).attrs({
     showsVerticalScrollIndicator: false,
     contentContainerStyle: {

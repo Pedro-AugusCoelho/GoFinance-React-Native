@@ -50,14 +50,20 @@ export default function App() {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-        <GestureHandlerRootView style={{flex: 1}}>
-          <StatusBar barStyle={'light-content'} backgroundColor={theme.colors.primary} />
-          <AuthProvider>
-            <MainRoute />
-          </AuthProvider>
-        </GestureHandlerRootView>
-    </ThemeProvider>
+    <>
+      {/* @ts-ignore */}
+      <ThemeProvider theme={theme}>
+          {/* @ts-ignore */}
+          <GestureHandlerRootView style={{flex: 1}}>
+            <StatusBar barStyle={'light-content'} backgroundColor={theme.colors.primary} />
+            
+            <AuthProvider>
+              <MainRoute />
+            </AuthProvider>
+          
+          </GestureHandlerRootView>
+      </ThemeProvider>
+    </>
   )
 }
 
