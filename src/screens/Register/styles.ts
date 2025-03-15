@@ -13,7 +13,7 @@ interface typeRegisterSelectedProps {
     type: 'income' | 'outcome' | '';
 }
 
-export const Container = styled.View`
+export const Container = styled.ScrollView`
     flex: 1;
     background-color: ${(props) => props.theme.colors.background};
 `;

@@ -4,7 +4,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import styled from "styled-components/native";
 import { Feather } from '@expo/vector-icons';
 
-export const Container = styled.View`
+export const Container = styled.ScrollView`
     flex: 1;
     background-color: ${(props) => props.theme.colors.background};
 `;
@@ -47,6 +47,9 @@ export const ImageContainer = styled.View`
     border-radius: ${RFValue(200)}px;
     border: ${RFValue(2)}px solid ${(props) => props.theme.colors.primary};
     background-color: ${(props) => props.theme.colors.shape};
+
+    justify-content: center;
+    align-items: center;
 `;
 
 // @ts-ignore
@@ -59,6 +62,7 @@ export const SelectImageIcon = styled(RectButton)`
     justify-content: center;
     align-items: center;
 
+    z-index: 1;
     position: absolute;
     bottom: ${RFValue(5)}px;
     right: ${RFValue(10)}px;
@@ -73,6 +77,7 @@ export const Icon = styled(Feather)`
 export const Image = styled.Image`
     width: 100%;
     height: 100%;
+    border-radius: ${RFValue(99)}px;
 `;
 
 export const Input = styled.TextInput`
@@ -93,4 +98,22 @@ export const Error = styled.Text`
     color: ${(props) => props.theme.colors.attention};
 
     margin-bottom: 7px;
+`;
+
+export const Btn = styled.TouchableOpacity`
+    width: 100%;
+    padding: ${RFValue(16)}px;
+    border-radius: 5px;
+    background-color: ${(props) => props.theme.colors.primary};
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: ${RFValue(5)}px;
+`;
+
+export const TitleBtn = styled.Text`
+    text-align: center;
+    font-family: ${({ theme }) => theme.fonts.medium};
+    font-size: ${RFValue(14)}px;
+    color: ${(props) => props.theme.colors.shape}; 
 `;

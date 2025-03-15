@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import { propsStack } from "../../routes/stack.routes";
 import { getTransactionsByMonth } from "../../storage/transaction/getTransactionByYearAndMonth";
 import { TransactionDTO } from "../../storage/transaction/transactionStorageDTO";
+import { useAuth } from "../../hooks/auth";
 
 interface HighlightDataProps {
     total: string;
@@ -32,9 +33,7 @@ export function Dashboard() {
     const [data, setData] = useState<TransactionDTO[]>([]);
     const [HighlightData , setHighlightData] = useState<HighlightData>({} as HighlightData);
 
-    // async function removeAll() {
-    //     await AsyncStorage.removeItem(dataKey);
-    // }
+    const { user } = useAuth()
 
     function handleEditCard (id: string) {
         navigation.push('Edit', {
@@ -114,15 +113,14 @@ export function Dashboard() {
         })
         setIsLoading(false);
     }
-    
 
     useFocusEffect(useCallback(() => {
-        loadData();
+        loadData()
     },[]))
 
     useEffect(() => {
-        loadData();
-    },[]);
+        loadData()
+    },[])
 
     if (isLoading) {
         return(
@@ -139,11 +137,11 @@ export function Dashboard() {
                     <S.UserWrapper>
                         {/* @ts-ignore */}
                         <S.UserInfo>
-                            <S.UserImage source={{ uri: 'https://github.com/Pedro-AugusCoelho.png'}} />
+                            <S.UserImage source={{ uri: user!.photo }} />
                              {/* @ts-ignore */}
                             <S.UserWelcome>
                                 <S.WelcomeHello>Olá,</S.WelcomeHello>
-                                <S.WelcomeName>Pedro Augusto C. C.</S.WelcomeName>
+                                <S.WelcomeName>{ user!.name.length > 20 ? user!.name.slice(0, 20) + '...' : user!.name }</S.WelcomeName>
                             </S.UserWelcome>
                         </S.UserInfo>
                     </S.UserWrapper>

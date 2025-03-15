@@ -25,7 +25,7 @@ export function StackRoutes () {
     return (
         <Navigator
             screenOptions={{
-                headerShown: false
+                headerShown: false,
             }}
         >   
             <Screen

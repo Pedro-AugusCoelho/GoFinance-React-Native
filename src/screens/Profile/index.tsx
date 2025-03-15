@@ -1,15 +1,17 @@
 import * as Yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
 
-import * as ImagePicker from 'expo-image-picker'
-import AsyncStorage from "@react-native-async-storage/async-storage"
-
 import * as P from './styles'
+
+import * as ImagePicker from 'expo-image-picker'
+
+import { useAuth } from "../../hooks/auth"
 import { useForm, Control, FieldValues, Controller } from "react-hook-form"
 import { TouchableWithoutFeedback, Keyboard } from "react-native"
-import { useEffect, useState } from "react"
-import { getUser } from "../../storage/user/getuser"
-import { setPhotoUser } from "../../storage/user/setPhotoUser"
+import { useCallback, useEffect, useState } from "react"
+import { useFocusEffect } from "@react-navigation/native"
+import { createBackup } from "../../storage/backup/createBackup"
+import { restoreBackup } from "../../storage/backup/restoreBackup"
 
 const schema = Yup.object().shape({
     name: Yup.string().required('Nome é obrigatório'),
@@ -20,7 +22,7 @@ interface FormData {
 }
 
 export function Profile() {
-    const [image, setImage] = useState<string>('')
+    const { user, savePhotoProfile, editUser } = useAuth()
 
     const {
         control,
@@ -33,21 +35,24 @@ export function Profile() {
     })
     const formControl = control as unknown as Control<FieldValues, any>
 
-    useEffect(() => {
-        (async () => {
-            // PEGAR O USUARIO SALVO
-            const storedUser = await getUser()
+    useFocusEffect(useCallback(() => {
+        getDataUser()
+    },[]))
 
-            if (storedUser) {
-                setImage(storedUser.photo)
-                reset({ name: storedUser.name })
-            }
-        })()
+    useEffect(() => {
+        getDataUser()
     }, [])
 
-    const handlePickImage = async () => {
+    function getDataUser () {
+        if (user && user.photo) {
+            reset({ name: user.name })
+        } 
+    }
+
+    async function handlePickImage () {
         // SOLICITA PERMISSÃO PARA ACESSAR A GALERIA SOMENTE QUANDO O BOTÃO FOR PRESSIONADO
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+        
         if (status !== 'granted') {
             alert('Precisamos de permissão para acessar suas fotos!')
             return
@@ -62,11 +67,32 @@ export function Profile() {
         })
 
         if (!result.canceled) {
-            // EM VERSÕES MAIS RECENTES, O RESULTADO VEM EM RESULT.ASSETS
+            // @ts-ignore
             const uri = result.assets ? result.assets[0].uri : result.uri
-            setImage(uri)
-            await setPhotoUser(uri)
+
+            await savePhotoProfile(uri)
         }
+    }
+
+    async function handleEditProfile(form: FormData) {
+        const dataUser = {
+            id: user!.id,
+            name: form.name,
+        }
+
+        await editUser(dataUser)
+    }
+
+    async function handleCreateBackup () {
+        const returnBackup = await createBackup()
+
+        console.log(returnBackup)
+    }
+
+    async function handleRestoreBackup () {
+        const returnRestoreBackup = await restoreBackup()
+        // TODO - AJUSTAR P RESTORE
+        console.log(returnRestoreBackup)
     }
         
     return (
@@ -92,7 +118,7 @@ export function Profile() {
                                 </P.SelectImageIcon>
                                 
                                 <>
-                                    { image && <P.Image source={{ uri: image }}/> }
+                                    { user!.photo && <P.Image source={{ uri: user!.photo }}/> }
                                 </>
                             </P.ImageContainer>
                         </P.ImageCenter>
@@ -112,6 +138,22 @@ export function Profile() {
                             )}
                         />
                         {errors.name && <P.Error>{errors.name.message}</P.Error>}
+
+                        <P.Btn onPress={handleSubmit(handleEditProfile)}>
+                            {/* @ts-ignore */}
+                            <P.TitleBtn>Alterar Nome</P.TitleBtn>
+                        </P.Btn>
+
+                        <P.Btn onPress={handleCreateBackup}>
+                            {/* @ts-ignore */}
+                            <P.TitleBtn>Criar Arquivo de Backup</P.TitleBtn>
+                        </P.Btn>
+
+                        <P.Btn onPress={handleRestoreBackup}>
+                            {/* @ts-ignore */}
+                            <P.TitleBtn>Restaurar Backup do Arquivo</P.TitleBtn>
+                        </P.Btn>
+
                     </P.InputContainer>
                 </P.Body>
             </P.Container>

@@ -5,11 +5,14 @@ import { useAuth } from "../hooks/auth"
 
 import { StackRoutes } from "./stack.routes"
 import { AuthRoutes } from "./auth.routes"
+import { Loading } from "../screens/Loading"
 
 export function MainRoute() {
-    const { user } = useAuth()
+    const { user, isLoadingUser } = useAuth()
 
-    console.log(user)
+    if (isLoadingUser) {
+        return <Loading />
+    }
 
     return(
         <NavigationContainer>

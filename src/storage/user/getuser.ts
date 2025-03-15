@@ -6,7 +6,7 @@ import { USER_COLLECTION } from "../storageConfig";
 export async function getUser() {
     try {
         const storage = await AsyncStorage.getItem(USER_COLLECTION)
-        const user: UserDTO = storage ? JSON.parse(storage) : []
+        const user: UserDTO = storage ? JSON.parse(storage) : null
 
         return user
     } catch (error) {

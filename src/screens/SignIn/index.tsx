@@ -40,7 +40,6 @@ export function SignIn () {
 
     function handleSignIn(form: FormData) {
         createUser(form)
-        navigation.navigate('Home')
     }
 
     return(
