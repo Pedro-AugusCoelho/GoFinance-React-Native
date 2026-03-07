@@ -13,6 +13,10 @@ interface typeRegisterSelectedProps {
     type: 'income' | 'outcome' | '';
 }
 
+interface CategoryItemProps {
+    isActive: boolean;
+}
+
 export const Container = styled.ScrollView`
     flex: 1;
     background-color: ${(props) => props.theme.colors.background};
@@ -22,17 +26,17 @@ export const ScrollView = styled.ScrollView``;
 
 export const Header = styled.View`
     width: 100%;
-    height: ${RFValue(115)}px;
+    height: ${RFValue(96)}px;
     background-color: ${(props) => props.theme.colors.primary};
     align-items: center;
 `;
 
 export const Title = styled.Text`
-    margin-top: ${getStatusBarHeight() + RFValue(37)}px;
+    margin-top: ${getStatusBarHeight() + RFValue(20)}px;
     padding-bottom: 18px;
     font-family: ${({ theme }) => theme.fonts.regular};
     font-size: ${RFValue(18)}px;
-    color: ${(props) => props.theme.colors.shape};
+    color: ${({ theme }) => theme.base.white};
 `;
 
 export const Body = styled.View`
@@ -45,16 +49,19 @@ export const InputContainer = styled.View`
    width: 100%;
 `;
 
-export const Input = styled.TextInput`
+export const Input = styled.TextInput.attrs((props) => ({
+    placeholderTextColor: props.theme.base.placeholder,
+}))`
     height: ${RFValue(50)}px;
     padding: ${RFValue(10)}px;
     margin-bottom: ${RFValue(10)}px;
-    background-color: ${(props) => props.theme.colors.shape};
+    background-color: ${({ theme }) => theme.base.shape_secondary};
+    border: 1px solid ${({ theme }) => theme.base.shape_third};
     border-radius: 5px;
 
     font-family: ${({ theme }) => theme.fonts.regular};
     font-size: ${RFValue(14)}px;
-    color: ${(props) => props.theme.colors.text};
+    color: ${({ theme }) => theme.base.title};
 `;
 
 export const BoxBtn = styled.View`
@@ -106,18 +113,26 @@ export const Footer = styled.View`
 
 // @ts-ignore
 export const BtnSubmit = styled(RectButton)`
+    flex-direction: row;
     width: 100%;
     align-items: center;
     margin-top: ${RFValue(15)}px;
-    padding: ${RFValue(10)}px;
-    border-radius: 5px;
-    background-color: ${(props) => props.theme.colors.secodary};
+    padding: ${RFValue(15)}px;
+    border-radius: 8px;
+    background-color: ${(props) => props.theme.colors.primary};
+`;
+
+export const IconSubmit = styled(Feather)`
+    color: ${({ theme }) => theme.base.white};
+    font-size: ${RFValue(20)}px;
 `;
 
 export const TextSubmit = styled.Text`
+    flex: auto;
+    text-align: center;
     font-family: ${({ theme }) => theme.fonts.medium};
     font-size: ${RFValue(14)}px;
-    color: ${(props) => props.theme.colors.shape};
+    color: ${({ theme }) => theme.base.white};
 `;
 
 // @ts-ignore
@@ -148,4 +163,75 @@ export const Error = styled.Text`
     color: ${(props) => props.theme.colors.attention};
 
     margin-bottom: 7px;
+`;
+
+export const ModalOverlay = styled.View`
+    flex: 1;
+    background-color: rgba(0, 0, 0, 0.45);
+    justify-content: flex-end;
+`;
+
+export const ModalCard = styled.View`
+    width: 100%;
+    max-height: 70%;
+    background-color: ${({ theme }) => theme.base.shape_primary};
+    border-top-left-radius: ${RFValue(18)}px;
+    border-top-right-radius: ${RFValue(18)}px;
+    padding: ${RFValue(16)}px;
+`;
+
+export const ModalHeader = styled.View`
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: ${RFValue(12)}px;
+`;
+
+export const ModalTitle = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.medium};
+    font-size: ${RFValue(16)}px;
+    color: ${({ theme }) => theme.colors.title};
+`;
+
+export const ModalClose = styled.TouchableOpacity`
+    width: ${RFValue(32)}px;
+    height: ${RFValue(32)}px;
+    border-radius: ${RFValue(16)}px;
+    align-items: center;
+    justify-content: center;
+    background-color: ${({ theme }) => theme.base.shape_secondary};
+`;
+
+export const ModalCloseIcon = styled(Feather)`
+    font-size: ${RFValue(16)}px;
+    color: ${({ theme }) => theme.colors.title};
+`;
+
+export const ModalCategoryItem = styled.TouchableOpacity<CategoryItemProps>`
+    width: 100%;
+    min-height: ${RFValue(52)}px;
+    border-radius: ${RFValue(8)}px;
+    padding: 0 ${RFValue(12)}px;
+    flex-direction: row;
+    align-items: center;
+    background-color: ${({ isActive, theme }) =>
+        isActive ? theme.base.shape_secondary : theme.base.transparent};
+`;
+
+export const ModalCategoryIcon = styled(Feather)`
+    font-size: ${RFValue(18)}px;
+    color: ${({ theme }) => theme.colors.text};
+    margin-right: ${RFValue(12)}px;
+`;
+
+export const ModalCategoryText = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.regular};
+    font-size: ${RFValue(15)}px;
+    color: ${({ theme }) => theme.colors.title};
+`;
+
+export const ModalSeparator = styled.View`
+    width: 100%;
+    height: 1px;
+    background-color: ${({ theme }) => theme.base.shape_third};
 `;

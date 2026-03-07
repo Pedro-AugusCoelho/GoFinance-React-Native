@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { addMonths, subMonths, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -14,16 +13,9 @@ import { HistoryCard } from "../../components/HistoryCard";
 import { categories } from "../../../utils/categories";
 import { ActivityIndicator } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { getAllTransactions } from "../../storage/transaction/getAllTransaction";
+import { TransactionDTO } from "../../storage/transaction/transactionStorageDTO";
 
-
-interface ExpensivesData {
-    type: 'income' | 'outcome';
-    name: string;
-    amount: string;
-    value: string;
-    category: string;
-    date: string;
-}
 
 interface CategoryData {
     key: string;
@@ -40,6 +32,16 @@ export function Resume() {
     const [ totalByCategories, setTotalByCategories ] = useState<CategoryData[]>([]);
     const [ selectedDate , setSelectedDate ] = useState(new Date);
     const theme = useTheme();
+    const bottomTabBarHeight = useBottomTabBarHeight();
+    const categoryColorsByKey: Record<string, string> = {
+        purchases: theme.product.purple_700,
+        food: theme.product.orange_500,
+        salary: theme.product.green_500,
+        car: theme.product.red_500,
+        leisure: theme.product.pink_500,
+        studies: theme.product.yellow_500,
+        health: theme.product.blue_500,
+    };
 
     function handleDateChange (action: 'next' | 'prev') {
         if (action === 'next') {
@@ -51,18 +53,16 @@ export function Resume() {
     
     async function loadData() {
         setIsLoading(true)
-        const dataKey = '@gofinances:transactions';
-        const response = await AsyncStorage.getItem(dataKey);
-        const responseFormatted = response ? JSON.parse(response) : [];
+        const responseFormatted = await getAllTransactions();
 
-        const expensives = responseFormatted.filter((expensives: ExpensivesData) => 
+        const expensives = responseFormatted.filter((expensives: TransactionDTO) => 
             expensives.type === 'outcome' &&
             new Date(expensives.date).getMonth() === selectedDate.getMonth() &&
             new Date(expensives.date).getFullYear() === selectedDate.getFullYear()
         );
 
-        const expensivesTotal = expensives.reduce((acc: number, expensive: ExpensivesData) => {
-            return acc + Number(expensive.value)
+        const expensivesTotal = expensives.reduce((acc: number, expensive: TransactionDTO) => {
+            return acc + expensive.value
         },0);
 
         const totalByCategory: CategoryData[] = []
@@ -70,9 +70,9 @@ export function Resume() {
         categories.forEach(categories => {
             let CategorySum = 0;
 
-            expensives.forEach((expensives: ExpensivesData) => {
+            expensives.forEach((expensives: TransactionDTO) => {
                 if (expensives.category === categories.key) {
-                    CategorySum += Number(expensives.value)
+                    CategorySum += expensives.value
                 }
             })
 
@@ -88,7 +88,7 @@ export function Resume() {
                         currency: 'BRL'
                     }),
                     percent,
-                    color: categories.color
+                    color: categoryColorsByKey[categories.key] ?? theme.colors.primary
                 })
             }
         })
@@ -115,7 +115,7 @@ export function Resume() {
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{
                             paddingHorizontal: 24,
-                            paddingBottom: useBottomTabBarHeight()
+                            paddingBottom: bottomTabBarHeight
                         }}
                     >
                     
@@ -135,27 +135,37 @@ export function Resume() {
                             </R.MonthSelectBtn>
                         </R.MonthSelect>
 
-                        <R.ChartContainer>
-                            <VictoryPie 
-                                data={totalByCategories}
-                                colorScale={totalByCategories.map(item => item.color)}
-                                style={{
-                                    labels: {
-                                        fontSize: RFValue(18),
-                                        fontWeight: 'bold',
-                                        fill: theme.colors.shape
-                                    },
-                                }}
-                                labelRadius={50}
-                                x='percent'
-                                y='total'
-                            />
-                        </R.ChartContainer>
-                            {
-                                totalByCategories.map((item) => (
-                                    <HistoryCard key={item.key} color={item.color} title={item.name} amount={item.totalFormatted} />
-                                ))
-                            }
+                        {totalByCategories.length > 0 ? (
+                            <>
+                                <R.ChartContainer>
+                                    <VictoryPie 
+                                        data={totalByCategories}
+                                        colorScale={totalByCategories.map(item => item.color)}
+                                        style={{
+                                            labels: {
+                                                fontSize: RFValue(18),
+                                                fontWeight: 'bold',
+                                                fill: theme.base.white
+                                            },
+                                        }}
+                                        labelRadius={50}
+                                        x='percent'
+                                        y='total'
+                                    />
+                                </R.ChartContainer>
+                                {
+                                    totalByCategories.map((item) => (
+                                        <HistoryCard key={item.key} color={item.color} title={item.name} amount={item.totalFormatted} />
+                                    ))
+                                }
+                            </>
+                        ) : (
+                            <R.EmptyContainer>
+                                <R.EmptyText>
+                                    Não há lançamentos neste mês para gerar o gráfico.
+                                </R.EmptyText>
+                            </R.EmptyContainer>
+                        )}
                     </R.Content>
                 </>
                 

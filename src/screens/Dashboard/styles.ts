@@ -9,6 +9,7 @@ export const LoadContainer = styled.View`
     flex: 1;
     justify-content: center;
     align-items: center;
+    background-color: ${(props) => props.theme.colors.background};
 `;
  
 export const Container = styled.View`
@@ -18,7 +19,7 @@ export const Container = styled.View`
 
 export const Header = styled.View`
     width: 100%;
-    height: ${RFPercentage(42)}px;
+    height: ${RFPercentage(28)}px;
     flex-direction: row;
     justify-content: center;
     align-items: flex-start;
@@ -31,7 +32,7 @@ export const UserWrapper = styled.View`
     align-items: center;
     width: 100%;
     padding: 0 24px;
-    margin-top: ${getStatusBarHeight() + RFValue(28)}px;
+    margin-top: ${getStatusBarHeight() + RFValue(20)}px;
 `;
 
 export const UserInfo = styled.View`
@@ -40,9 +41,27 @@ export const UserInfo = styled.View`
 `;
 
 export const UserImage = styled.Image`
-    width: ${RFValue(48)}px;
-    height: ${RFValue(48)}px;
+    width: ${RFValue(40)}px;
+    height: ${RFValue(40)}px;
     border-radius: 10px;
+`;
+
+export const UserAvatarPlaceholder = styled.View`
+    width: ${RFValue(40)}px;
+    height: ${RFValue(40)}px;
+    border-radius: 10px;
+    background-color: ${(props) => props.theme.colors.avatar_bg};
+    justify-content: center;
+    align-items: center;
+`;
+
+// @ts-ignore
+export const UserAvatarText = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.bold};
+    font-size: ${RFValue(18)}px;
+    color: ${(props) => props.theme.colors.avatar_text};
+    text-align: center;
+    line-height: ${RFValue(40)}px;
 `;
 
 export const UserWelcome = styled.View`
@@ -51,14 +70,14 @@ export const UserWelcome = styled.View`
 
 export const WelcomeName = styled.Text`
     font-family: ${({ theme }) => theme.fonts.bold};
-    font-size: ${RFValue(18)}px;
-    color: ${(props) => props.theme.colors.shape};
+    font-size: ${RFValue(16)}px;
+    color: ${({ theme }) => theme.base.white};
 `;
 
 export const WelcomeHello = styled.Text`
     font-family: ${({ theme }) => theme.fonts.regular};
-    font-size: ${RFValue(18)}px;
-    color: ${(props) => props.theme.colors.shape};
+    font-size: ${RFValue(16)}px;
+    color: ${({ theme }) => theme.base.white};
 `;
 
 // @ts-ignore
@@ -77,19 +96,85 @@ export const HighlightCards = styled.ScrollView.attrs({
 })`
     width:100%;
     position: absolute;
-    margin-top: ${RFPercentage(20)}px;
+    margin-top: ${RFPercentage(16)}px;
 `;
 
 export const Transactions = styled.View`
     flex: 1;
     padding: 0 24px;
-    margin-top: ${RFPercentage(12)}px;
+    margin-top: ${RFPercentage(16)}px;
+    background-color: ${(props) => props.theme.colors.background};
+`;
+
+export const TitleRow = styled.View`
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: ${RFValue(8)}px;
 `;
 
 export const Title = styled.Text`
     font-family: ${({ theme }) => theme.fonts.regular};
     font-size: ${RFValue(18)}px;
     color: ${(props) => props.theme.colors.title};
+`;
+
+export const PeriodLabel = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.regular};
+    font-size: ${RFValue(12)}px;
+    color: ${(props) => props.theme.colors.text};
+`;
+
+export const FilterRow = styled.View`
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: ${RFValue(12)}px;
+`;
+
+export const DirectionButton = styled.TouchableOpacity`
+    width: ${RFValue(36)}px;
+    height: ${RFValue(36)}px;
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: ${({ theme }) => theme.base.shape_third};
+    background-color: ${({ theme }) => theme.base.shape_secondary};
+    justify-content: center;
+    align-items: center;
+    margin-right: ${RFValue(8)}px;
+`;
+
+export const DirectionIcon = styled(Feather)`
+    font-size: ${RFValue(16)}px;
+    color: ${({ theme }) => theme.colors.primary};
+`;
+
+export const FilterList = styled.ScrollView.attrs({
+    contentContainerStyle: {
+        alignItems: 'center',
+        paddingRight: 24,
+        paddingVertical: 4,
+    }
+})`
+    flex: 1;
+`;
+
+export const FilterButton = styled.TouchableOpacity<{ active: boolean }>`
+    height: ${RFValue(36)}px;
+    padding: ${RFValue(8)}px ${RFValue(12)}px;
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: ${({ active, theme }) => active ? theme.colors.primary : theme.base.shape_third};
+    background-color: ${({ active, theme }) => active ? theme.base.shape_primary : theme.base.shape_secondary};
+    justify-content: center;
+    align-items: center;
+    margin-right: ${RFValue(8)}px;
+`;
+
+export const FilterText = styled.Text<{ active: boolean }>`
+    font-family: ${({ theme }) => theme.fonts.medium};
+    font-size: ${RFValue(12)}px;
+    line-height: ${RFValue(16)}px;
+    color: ${({ active, theme }) => active ? theme.colors.primary : theme.colors.text};
 `;
 
 export const TransactionsList = styled(

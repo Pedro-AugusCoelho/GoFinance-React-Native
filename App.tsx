@@ -6,6 +6,7 @@ import { StatusBar } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { MainRoute } from './src/routes';
+import { useTheme } from 'styled-components';
 
 import {
   useFonts,
@@ -14,10 +15,26 @@ import {
   Poppins_700Bold
 } from '@expo-google-fonts/poppins'
 
-import theme from './src/global/styles/theme';
-import { ThemeProvider } from 'styled-components';
-
 import { AuthProvider } from './src/hooks/auth';
+import { AppThemeProvider } from './src/hooks/theme';
+
+function AppContent() {
+  const theme = useTheme()
+
+  return (
+    // @ts-ignore
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <StatusBar
+        barStyle={'light-content'}
+        backgroundColor={theme.colors.primary}
+      />
+
+      <AuthProvider>
+        <MainRoute />
+      </AuthProvider>
+    </GestureHandlerRootView>
+  )
+}
 
 export default function App() {
   
@@ -50,20 +67,9 @@ export default function App() {
   }
 
   return (
-    <>
-      {/* @ts-ignore */}
-      <ThemeProvider theme={theme}>
-          {/* @ts-ignore */}
-          <GestureHandlerRootView style={{flex: 1}}>
-            <StatusBar barStyle={'light-content'} backgroundColor={theme.colors.primary} />
-            
-            <AuthProvider>
-              <MainRoute />
-            </AuthProvider>
-          
-          </GestureHandlerRootView>
-      </ThemeProvider>
-    </>
+    <AppThemeProvider>
+      <AppContent />
+    </AppThemeProvider>
   )
 }
 

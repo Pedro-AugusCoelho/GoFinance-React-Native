@@ -7,7 +7,7 @@ export const Container = styled.View`
 `;
 
 export const Header = styled.View`
-    height: 70%;
+    height: 62%;
     background-color: ${(props) => props.theme.colors.primary};
 `;
 
@@ -15,15 +15,15 @@ export const TitleWrapper = styled.View`
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    margin: 50px 38px;
+    margin: 34px 38px;
 `;
 
 export const Title = styled.Text`
-    margin-top: 45px;
+    margin-top: 24px;
     text-align: center;
     font-family: ${({ theme }) => theme.fonts.medium};
     font-size: ${RFValue(30)}px;
-    color: ${(props) => props.theme.colors.shape};
+    color: ${({ theme }) => theme.base.white};
 `;
 
 export const ContainerAccessInfo = styled.View`
@@ -37,7 +37,7 @@ export const AccessInfo = styled.Text`
     text-align: center;
     font-family: ${({ theme }) => theme.fonts.regular};
     font-size: ${RFValue(16)}px;
-    color: ${(props) => props.theme.colors.shape}; 
+    color: ${({ theme }) => theme.base.white}; 
 `;
 
 export const Footer = styled.View`
@@ -51,16 +51,19 @@ export const Float = styled.View`
     margin-top: ${RFValue(-30)}px;
 `;
 
-export const Input = styled.TextInput`
+export const Input = styled.TextInput.attrs((props) => ({
+    placeholderTextColor: props.theme.base.placeholder,
+}))`
     height: ${RFValue(55)}px;
     padding: ${RFValue(16)}px;
     margin-bottom: ${RFValue(10)}px;
-    background-color: ${(props) => props.theme.colors.shape};
+    background-color: ${({ theme }) => theme.base.shape_secondary};
+    border: 1px solid ${({ theme }) => theme.base.shape_third};
     border-radius: 5px;
 
     font-family: ${({ theme }) => theme.fonts.regular};
     font-size: ${RFValue(14)}px;
-    color: ${(props) => props.theme.colors.text};
+    color: ${({ theme }) => theme.base.title};
 `;
 
 export const Error = styled.Text`
@@ -85,6 +88,6 @@ export const TitleSignIn = styled.Text`
     text-align: center;
     font-family: ${({ theme }) => theme.fonts.medium};
     font-size: ${RFValue(14)}px;
-    color: ${(props) => props.theme.colors.shape}; 
+    color: ${({ theme }) => theme.base.white}; 
 `;
 

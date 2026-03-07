@@ -8,11 +8,11 @@ interface typeProps {
 
 
 export const Container = styled.View<typeProps>`
-    width: ${RFValue(300)}px;
+    width: ${RFValue(260)}px;
     border-radius: 5px;
-    padding: 19px 23px;
+    padding: 16px 20px;
     margin-right: 16px;
-    padding-bottom: ${RFValue(42)}px;
+    padding-bottom: ${RFValue(28)}px;
     background-color: ${({type , theme}) => type === 'total' ? theme.colors.secodary : theme.colors.shape }
 `;
 
@@ -23,12 +23,12 @@ export const Header = styled.View`
 
 export const Title = styled.Text<typeProps>`
     font-family: ${({ theme }) => theme.fonts.regular};
-    font-size: ${RFValue(14)}px;
+    font-size: ${RFValue(13)}px;
     color: ${({type , theme}) => type === 'total' ? theme.colors.shape : theme.colors.title };
 `;
 
 export const Icon = styled(Feather)<typeProps>`
-   font-size: ${RFValue(40)}px;
+   font-size: ${RFValue(32)}px;
 
     ${(props) => props.type === 'up' && css`
         color: ${(props) => props.theme.colors.success} ;
@@ -48,13 +48,13 @@ export const Footer = styled.View`
 
 export const Amount = styled.Text<typeProps>`
     font-family: ${({ theme }) => theme.fonts.medium};
-    font-size: ${RFValue(32)}px;
+    font-size: ${RFValue(28)}px;
     color: ${({type , theme}) => type === 'total' ? theme.colors.shape : theme.colors.title };
-    margin-top: 38px;
+    margin-top: 24px;
 `;
 
 export const LastTransaction = styled.Text<typeProps>`
     font-family: ${({ theme }) => theme.fonts.regular};
     color: ${({type , theme}) => type === 'total' ? theme.colors.shape : theme.colors.text };
-    font-size: ${RFValue(12)}px;
+    font-size: ${RFValue(11)}px;
 `;

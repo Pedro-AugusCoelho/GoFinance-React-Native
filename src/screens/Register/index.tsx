@@ -5,11 +5,13 @@ import { RootTabParamList } from "../../routes/app.routes"
 import * as Yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Control, Controller, FieldValues, useForm } from "react-hook-form"
-import { Modal, TouchableWithoutFeedback, Keyboard, Alert, Button, Platform, Text, TouchableOpacity } from "react-native"
+import { Modal, TouchableWithoutFeedback, Keyboard, Alert, Platform, TouchableOpacity, FlatList, KeyboardAvoidingView } from "react-native"
 import { useNavigation } from '@react-navigation/native'
 
-import { CategorySelect } from "../CategorySelect"
 import * as R from './styles'
+import { categories } from "../../../utils/categories"
+import { TRANSACTION_COLLECTION } from "../../storage/storageConfig"
+import { getAllTransactions } from "../../storage/transaction/getAllTransaction"
 
 import DateTimePicker from "@react-native-community/datetimepicker"
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs"
@@ -19,6 +21,12 @@ interface FormData {
     value: string
     amount: string
     date: Date
+}
+
+interface CategoryData {
+    key: string
+    name: string
+    icon: string
 }
 
 type TabNavigationProps = BottomTabNavigationProp<RootTabParamList>
@@ -37,7 +45,7 @@ const schema = Yup.object().shape({
 
 export function Register() {
     const navigation: TabNavigationProps = useNavigation()
-    const dataKey = '@gofinances:transactions'
+    const dataKey = TRANSACTION_COLLECTION
     
     const {
         control,
@@ -71,6 +79,14 @@ export function Register() {
         setModalCategory(false)
     }
 
+    function handleCategorySelect(item: CategoryData) {
+        setCategory({
+            key: item.key,
+            name: item.name,
+        })
+        handleCloseCategoryModal()
+    }
+
     async function handleRegister(form: FormData) {
         if (category.key === 'category') {
             Alert.alert('Selecione a categoria');
@@ -87,7 +103,7 @@ export function Register() {
             return;
         }
     
-        const totalValue = Number(form.value);
+        const totalValue = Number(String(form.value).replace(',', '.'));
         const installments = Number(form.amount);
     
         if (installments < 1) {
@@ -96,10 +112,10 @@ export function Register() {
         }
     
         const installmentValue = totalValue / installments; // Divide o valor total pelo número de parcelas
+        const planId = String(uuid.v4())
     
         try {
-            const data = await AsyncStorage.getItem(dataKey);
-            const currentData = data ? JSON.parse(data) : [];
+            const currentData = await getAllTransactions();
     
             const newTransactions = [];
             let transactionDate = new Date(date); // Usa a data informada como base
@@ -107,12 +123,18 @@ export function Register() {
             for (let i = 0; i < installments; i++) {
                 const newTransaction = {
                     id: String(uuid.v4()),
-                    name: `${form.name} - ${String(i + 1).padStart(2, '0')}/${installments}`,
-                    value: installmentValue.toFixed(2),
+                    name: installments > 1
+                        ? `${form.name} - ${String(i + 1).padStart(2, '0')}/${installments}`
+                        : form.name,
+                    value: Number(installmentValue.toFixed(2)),
                     amount: installments,
                     type: transactionType,
                     category: category.key,
                     date: transactionDate.toISOString(),
+                    planId,
+                    installmentNumber: i + 1,
+                    installmentTotal: installments,
+                    status: 'pending',
                 };
     
                 newTransactions.push(newTransaction);
@@ -143,8 +165,16 @@ export function Register() {
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            >
             {/* @ts-ignore */}
-            <R.Container>
+            <R.Container
+                keyboardShouldPersistTaps="handled"
+                keyboardDismissMode="on-drag"
+                contentContainerStyle={{ flexGrow: 1 }}
+            >
                 <R.Header>
                     {/* @ts-ignore */}
                     <R.Title>Cadastro</R.Title>
@@ -209,7 +239,9 @@ export function Register() {
                                 <DateTimePicker
                                     value={date}
                                     mode="date"
-                                    display="default"
+                                    display={Platform.OS === 'android' ? 'spinner' : 'default'}
+                                    positiveButton={{ label: 'OK', textColor: '#00875F' }}
+                                    negativeButton={{ label: 'Cancelar', textColor: '#00875F' }}
                                     onChange={(event, selectedDate) => {
                                         const currentDate = selectedDate || date
                                         setShowDatePicker(Platform.OS === 'ios')
@@ -224,13 +256,13 @@ export function Register() {
                             {/* @ts-ignore */}
                             <R.BtnSelected onPress={() => setTransactionType('income')} isActive={transactionType === 'income'} type={transactionType}>
                                 <R.Icon name='arrow-up-circle' type='income' />
-                                <R.TextBtn>Income</R.TextBtn>
+                                <R.TextBtn>Entrada</R.TextBtn>
                             </R.BtnSelected>
 
                             {/* @ts-ignore */}
                             <R.BtnSelected onPress={() => setTransactionType('outcome')} isActive={transactionType === 'outcome'} type={transactionType}>
                                 <R.Icon name='arrow-down-circle' type='outcome' />
-                                <R.TextBtn>Outcome</R.TextBtn>
+                                <R.TextBtn>Saída</R.TextBtn>
                             </R.BtnSelected>
                         </R.BoxBtn>
 
@@ -240,19 +272,42 @@ export function Register() {
                         </R.Category>
                     </R.InputContainer>
 
-                    <R.BtnSubmit onPress={handleSubmit(handleRegister)}>
-                        <R.TextSubmit>Enviar</R.TextSubmit>
+                    <R.BtnSubmit onPress={() => handleSubmit(handleRegister)()}>
+                        <R.IconSubmit name='save' />
+                        <R.TextSubmit>Salvar</R.TextSubmit>
                     </R.BtnSubmit>
                 </R.Body>
 
-                <Modal visible={modalCategory}>
-                    <CategorySelect
-                        category={category}
-                        setCategory={setCategory}
-                        closeSelectCategory={handleCloseCategoryModal}
-                    />
+                <Modal visible={modalCategory} transparent animationType="slide">
+                    <R.ModalOverlay>
+                        <R.ModalCard>
+                            <R.ModalHeader>
+                                <R.ModalTitle>Selecione a categoria</R.ModalTitle>
+                                <R.ModalClose onPress={handleCloseCategoryModal}>
+                                    <R.ModalCloseIcon name="x" />
+                                </R.ModalClose>
+                            </R.ModalHeader>
+
+                            <FlatList
+                                data={categories}
+                                keyExtractor={(item) => item.key}
+                                showsVerticalScrollIndicator={false}
+                                renderItem={({ item }) => (
+                                    <R.ModalCategoryItem
+                                        onPress={() => handleCategorySelect(item as CategoryData)}
+                                        isActive={category.key === item.key}
+                                    >
+                                        <R.ModalCategoryIcon name={item.icon as any} />
+                                        <R.ModalCategoryText>{item.name}</R.ModalCategoryText>
+                                    </R.ModalCategoryItem>
+                                )}
+                                ItemSeparatorComponent={() => <R.ModalSeparator />}
+                            />
+                        </R.ModalCard>
+                    </R.ModalOverlay>
                 </Modal>
             </R.Container>
+            </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
     )
 }

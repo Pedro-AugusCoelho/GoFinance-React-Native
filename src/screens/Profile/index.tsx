@@ -7,11 +7,13 @@ import * as ImagePicker from 'expo-image-picker'
 
 import { useAuth } from "../../hooks/auth"
 import { useForm, Control, FieldValues, Controller } from "react-hook-form"
-import { TouchableWithoutFeedback, Keyboard } from "react-native"
+import { TouchableWithoutFeedback, Keyboard, Alert, ActivityIndicator, Switch, KeyboardAvoidingView, Platform } from "react-native"
 import { useCallback, useEffect, useState } from "react"
 import { useFocusEffect } from "@react-navigation/native"
 import { createBackup } from "../../storage/backup/createBackup"
 import { restoreBackup } from "../../storage/backup/restoreBackup"
+import { useTheme } from "styled-components"
+import { useAppTheme } from "../../hooks/theme"
 
 const schema = Yup.object().shape({
     name: Yup.string().required('Nome é obrigatório'),
@@ -23,6 +25,10 @@ interface FormData {
 
 export function Profile() {
     const { user, savePhotoProfile, editUser } = useAuth()
+    const { isDark, toggleTheme } = useAppTheme()
+    const theme = useTheme()
+    const [isLoadingBackup, setIsLoadingBackup] = useState(false)
+    const [isLoadingRestore, setIsLoadingRestore] = useState(false)
 
     const {
         control,
@@ -81,24 +87,73 @@ export function Profile() {
         }
 
         await editUser(dataUser)
+        Alert.alert('Sucesso', 'Nome atualizado com sucesso!')
     }
 
     async function handleCreateBackup () {
-        const returnBackup = await createBackup()
+        setIsLoadingBackup(true)
+        try {
+            const result = await createBackup()
 
-        console.log(returnBackup)
+            if (result && result.success) {
+                Alert.alert('Sucesso', result.message)
+            } else {
+                Alert.alert('Erro', result?.message || 'Erro ao criar backup')
+            }
+        } catch (error) {
+            Alert.alert('Erro', 'Erro ao criar backup')
+            console.error(error)
+        } finally {
+            setIsLoadingBackup(false)
+        }
     }
 
     async function handleRestoreBackup () {
-        const returnRestoreBackup = await restoreBackup()
-        // TODO - AJUSTAR P RESTORE
-        console.log(returnRestoreBackup)
+        Alert.alert(
+            'Confirmar Restauração',
+            'Tem certeza que deseja restaurar o backup? Isto irá substituir todos os dados atuais.',
+            [
+                {
+                    text: 'Cancelar',
+                    style: 'cancel'
+                },
+                {
+                    text: 'Restaurar',
+                    style: 'destructive',
+                    onPress: async () => {
+                        setIsLoadingRestore(true)
+                        try {
+                            const result = await restoreBackup()
+
+                            if (result && result.success) {
+                                Alert.alert('Sucesso', result.message)
+                            } else {
+                                Alert.alert('Erro', result?.message || 'Erro ao restaurar backup')
+                            }
+                        } catch (error) {
+                            Alert.alert('Erro', 'Erro ao restaurar backup')
+                            console.error(error)
+                        } finally {
+                            setIsLoadingRestore(false)
+                        }
+                    }
+                }
+            ]
+        )
     }
         
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            >
             {/* @ts-ignore */}
-            <P.Container>
+            <P.Container
+                keyboardShouldPersistTaps="handled"
+                keyboardDismissMode="on-drag"
+                contentContainerStyle={{ flexGrow: 1 }}
+            >
                 {/* @ts-ignore */}
                 <P.Header>
                     {/* @ts-ignore */}
@@ -117,9 +172,16 @@ export function Profile() {
                                     <P.Icon name="camera" />
                                 </P.SelectImageIcon>
                                 
-                                <>
-                                    { user!.photo && <P.Image source={{ uri: user!.photo }}/> }
-                                </>
+                                {user!.photo ? (
+                                    <P.Image source={{ uri: user!.photo }}/>
+                                ) : (
+                                    <P.AvatarPlaceholder>
+                                        {/* @ts-ignore */}
+                                        <P.AvatarText>
+                                            {user!.name.charAt(0).toUpperCase()}
+                                        </P.AvatarText>
+                                    </P.AvatarPlaceholder>
+                                )}
                             </P.ImageContainer>
                         </P.ImageCenter>
 
@@ -139,24 +201,72 @@ export function Profile() {
                         />
                         {errors.name && <P.Error>{errors.name.message}</P.Error>}
 
+                        {/* @ts-ignore */}
                         <P.Btn onPress={handleSubmit(handleEditProfile)}>
+                            {/* @ts-ignore */}
+                            <P.BtnIcon name="edit-3" />
                             {/* @ts-ignore */}
                             <P.TitleBtn>Alterar Nome</P.TitleBtn>
                         </P.Btn>
 
-                        <P.Btn onPress={handleCreateBackup}>
-                            {/* @ts-ignore */}
-                            <P.TitleBtn>Criar Arquivo de Backup</P.TitleBtn>
-                        </P.Btn>
+                        {/* @ts-ignore */}
+                        <P.Section>
+                            <P.SectionTitle>Aparência</P.SectionTitle>
+                            <P.ThemeRow>
+                                <P.ThemeLabel>
+                                    {isDark ? 'Modo escuro ativo' : 'Modo claro ativo'}
+                                </P.ThemeLabel>
 
-                        <P.Btn onPress={handleRestoreBackup}>
+                                <Switch
+                                    value={isDark}
+                                    onValueChange={toggleTheme}
+                                    trackColor={{ false: theme.colors.text, true: theme.colors.primary }}
+                                    thumbColor={theme.colors.shape}
+                                />
+                            </P.ThemeRow>
+                        </P.Section>
+
+                        {/* @ts-ignore */}
+                        <P.Section>
+                            <P.SectionTitle>Backup de Dados</P.SectionTitle>
+                            
                             {/* @ts-ignore */}
-                            <P.TitleBtn>Restaurar Backup do Arquivo</P.TitleBtn>
-                        </P.Btn>
+                            <P.Btn onPress={handleCreateBackup} disabled={isLoadingBackup}>
+                                {/* @ts-ignore */}
+                                {isLoadingBackup ? (
+                                    // @ts-ignore
+                                    <ActivityIndicator color={theme.colors.shape} />
+                                ) : (
+                                    <>
+                                        {/* @ts-ignore */}
+                                        <P.BtnIcon name="download" />
+                                        {/* @ts-ignore */}
+                                        <P.TitleBtn>Exportar Backup</P.TitleBtn>
+                                    </>
+                                )}
+                            </P.Btn>
+
+                            {/* @ts-ignore */}
+                            <P.BtnSecondary onPress={handleRestoreBackup} disabled={isLoadingRestore}>
+                                {/* @ts-ignore */}
+                                {isLoadingRestore ? (
+                                    // @ts-ignore
+                                    <ActivityIndicator color={theme.colors.primary} />
+                                ) : (
+                                    <>
+                                        {/* @ts-ignore */}
+                                        <P.BtnIconSecondary name="upload" />
+                                        {/* @ts-ignore */}
+                                        <P.TitleBtnSecondary>Importar Backup</P.TitleBtnSecondary>
+                                    </>
+                                )}
+                            </P.BtnSecondary>
+                        </P.Section>
 
                     </P.InputContainer>
                 </P.Body>
             </P.Container>
+            </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
     )
 }

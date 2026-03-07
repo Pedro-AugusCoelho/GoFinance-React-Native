@@ -23,7 +23,7 @@ export const Header = styled.View`
     padding: 0 20px;
     align-items: center;
     width: 100%;
-    height: ${RFValue(115)}px;
+    height: ${RFValue(96)}px;
     background-color: ${(props) => props.theme.colors.primary};
 `;
 
@@ -32,7 +32,7 @@ export const GoBack = styled.TouchableOpacity`
 `;
 
 export const IconGoBack = styled(Feather)`
-    color: ${(props) => props.theme.colors.shape};
+    color: ${({ theme }) => theme.base.white};
     font-size: ${RFValue(24)}px;
 `;
 
@@ -42,7 +42,7 @@ export const Title = styled.Text`
     text-align: center;
     font-family: ${({ theme }) => theme.fonts.regular};
     font-size: ${RFValue(18)}px;
-    color: ${(props) => props.theme.colors.shape};
+    color: ${({ theme }) => theme.base.white};
 `;
 
 export const Body = styled.View`
@@ -55,16 +55,34 @@ export const InputContainer = styled.View`
    width: 100%;
 `;
 
-export const Input = styled.TextInput`
+export const InstallmentInfo = styled.View`
+    width: 100%;
+    padding: ${RFValue(10)}px ${RFValue(12)}px;
+    border-radius: 8px;
+    border: 1px solid ${({ theme }) => theme.base.shape_third};
+    background-color: ${({ theme }) => theme.base.shape_secondary};
+    margin-bottom: ${RFValue(12)}px;
+`;
+
+export const InstallmentInfoText = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.medium};
+    font-size: ${RFValue(13)}px;
+    color: ${(props) => props.theme.colors.text};
+`;
+
+export const Input = styled.TextInput.attrs((props) => ({
+    placeholderTextColor: props.theme.base.placeholder,
+}))`
     height: ${RFValue(55)}px;
     padding: ${RFValue(16)}px;
     margin-bottom: ${RFValue(10)}px;
-    background-color: ${(props) => props.theme.colors.shape};
+    background-color: ${({ theme }) => theme.base.shape_secondary};
+    border: 1px solid ${({ theme }) => theme.base.shape_third};
     border-radius: 5px;
 
     font-family: ${({ theme }) => theme.fonts.regular};
     font-size: ${RFValue(14)}px;
-    color: ${(props) => props.theme.colors.text};
+    color: ${({ theme }) => theme.base.title};
 `;
 
 export const BoxBtn = styled.View`
@@ -72,16 +90,18 @@ export const BoxBtn = styled.View`
     justify-content: space-between;
     flex-direction: row;
     margin-bottom: 16px;
+    gap: ${RFValue(10)}px;
 `;
 
 export const BtnSelected = styled.TouchableOpacity<typeRegisterSelectedProps>`
-    width: 48%;
+    flex: 1;
+    min-height: ${RFValue(58)}px;
     align-items: center;
     justify-content: center;
     flex-direction: row;
-    border-color: ${(props) => props.theme.colors.text};
+    border-color: ${({ theme }) => theme.base.shape_third};
     border-width: 1px;
-    border-radius: 5px;
+    border-radius: 8px;
     padding: 15px;
 
    ${({isActive, type, theme}) => isActive && type === 'income' && css`
@@ -102,7 +122,7 @@ export const Icon = styled(Feather)<typeRegisterProps>`
 `;
 
 export const TextBtn = styled.Text`
-    font-family: ${({ theme }) => theme.fonts.regular};
+    font-family: ${({ theme }) => theme.fonts.medium};
     font-size: ${RFValue(14)}px;
     color: ${(props) => props.theme.colors.title};
 `;
@@ -115,13 +135,14 @@ export const BtnSubmit = styled(RectButton)`
     flex-direction: row;
     width: 100%;
     align-items: center;
+    justify-content: center;
     padding: ${RFValue(15)}px;
-    border-radius: 5px;
-    background-color: ${(props) => props.theme.colors.secodary};
+    border-radius: 8px;
+    background-color: ${(props) => props.theme.colors.primary};
 `;
 
 export const IconBtn = styled(Feather)`
-    color: ${(props) => props.theme.colors.shape};
+    color: ${({ theme }) => theme.base.white};
     font-size: ${RFValue(20)}px;
 `;
 
@@ -129,8 +150,9 @@ export const BtnDelete = styled(RectButton)`
     flex-direction: row;
     width: 100%;
     align-items: center;
+    justify-content: center;
     padding: ${RFValue(15)}px;
-    border-radius: 5px;
+    border-radius: 8px;
     background-color: ${(props) => props.theme.colors.attention};
     margin-bottom: ${RFValue(16)}px;
 `;
@@ -140,7 +162,7 @@ export const TextDelete = styled.Text`
     text-align: center;
     font-family: ${({ theme }) => theme.fonts.medium};
     font-size: ${RFValue(14)}px;
-    color: ${(props) => props.theme.colors.shape};
+    color: ${({ theme }) => theme.base.white};
 `;
 
 export const TextSubmit = styled.Text`
@@ -148,7 +170,7 @@ export const TextSubmit = styled.Text`
     text-align: center;
     font-family: ${({ theme }) => theme.fonts.medium};
     font-size: ${RFValue(14)}px;
-    color: ${(props) => props.theme.colors.shape};
+    color: ${({ theme }) => theme.base.white};
 `;
 
 export const Category = styled(RectButton)`

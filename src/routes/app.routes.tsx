@@ -1,8 +1,8 @@
 import React from "react";
 import { useTheme } from "styled-components";
-import { Platform } from "react-native";
+import { Alert, Platform, ToastAndroid, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const {Navigator, Screen} = createBottomTabNavigator();
 
@@ -10,7 +10,6 @@ import { Dashboard } from "../screens/Dashboard";
 import { Register } from "../screens/Register";
 import { Resume } from "../screens/Resume";
 import { Profile } from "../screens/Profile";
-import { TouchableOpacity } from "react-native";
 
 
 export type RootTabParamList = {
@@ -21,18 +20,37 @@ export type RootTabParamList = {
 }
 
 export function BottomTabsRoutes () {
-    const theme = useTheme();
+    const theme = useTheme()
+
+    const createTabButton = (tabName: string) => (props: BottomTabBarButtonProps) => (
+        <TouchableOpacity
+            {...props}
+            activeOpacity={0.7}
+            delayLongPress={650}
+            onLongPress={(event) => {
+                props.onLongPress?.(event)
+
+                if (Platform.OS === 'android') {
+                    ToastAndroid.show(tabName, ToastAndroid.LONG)
+                } else {
+                    Alert.alert(tabName)
+                }
+            }}
+        />
+    )
 
     return(
         <Navigator
             screenOptions={{
                 headerShown: false,
-                tabBarActiveTintColor: theme.colors.secodary,
-                tabBarInactiveTintColor:  theme.colors.text,
-                tabBarLabelPosition: 'below-icon',
+                tabBarActiveTintColor: theme.product.green_500,
+                tabBarInactiveTintColor: theme.base.text,
+                tabBarShowLabel: false,
                 tabBarStyle:{
                     height: 70,
-                    paddingVertical: Platform.OS === 'ios' ? 20 : 0
+                    paddingVertical: Platform.OS === 'ios' ? 20 : 0,
+                    backgroundColor: theme.base.shape_primary,
+                    borderTopColor: theme.base.shape_third,
                 },
             }}
         >
@@ -40,14 +58,13 @@ export function BottomTabsRoutes () {
                 name="Listagem"
                 component={Dashboard}
                 options={{
+                    tabBarButton: createTabButton('Listagem'),
                     tabBarIcon: (({ size, color }) => 
-                    <TouchableOpacity>
                         <MaterialIcons
                             name="format-list-bulleted"
                             size={size}
                             color={color}
                         />
-                    </TouchableOpacity>
                     )
                 }}
             />
@@ -57,6 +74,7 @@ export function BottomTabsRoutes () {
                 initialParams={{idTransaction: null, action: 'salvar'}}
                 component={Register}
                 options={{
+                    tabBarButton: createTabButton('Cadastrar'),
                     tabBarIcon: (({ size, color }) => 
                         <MaterialIcons
                             name="attach-money"
@@ -71,6 +89,7 @@ export function BottomTabsRoutes () {
                 name="Resumo"
                 component={Resume}
                 options={{
+                    tabBarButton: createTabButton('Resumo'),
                     tabBarIcon: (({ size, color }) => 
                     <MaterialIcons
                         name="pie-chart"
@@ -85,6 +104,7 @@ export function BottomTabsRoutes () {
                 name="Perfil"
                 component={Profile}
                 options={{
+                    tabBarButton: createTabButton('Perfil'),
                     tabBarIcon: (({ size, color }) => 
                     <MaterialIcons
                         name="person"

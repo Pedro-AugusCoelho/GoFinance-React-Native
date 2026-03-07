@@ -11,17 +11,17 @@ export const Container = styled.ScrollView`
 
 export const Header = styled.View`
     width: 100%;
-    height: ${RFValue(115)}px;
+    height: ${RFValue(96)}px;
     background-color: ${(props) => props.theme.colors.primary};
     align-items: center;
 `;
 
 export const Title = styled.Text`
-    margin-top: ${getStatusBarHeight() + RFValue(37)}px;
+    margin-top: ${getStatusBarHeight() + RFValue(20)}px;
     padding-bottom: 18px;
     font-family: ${({ theme }) => theme.fonts.regular};
     font-size: ${RFValue(18)}px;
-    color: ${(props) => props.theme.colors.shape};
+    color: ${({ theme }) => theme.base.white};
 `;
 
 export const Body = styled.View`
@@ -52,6 +52,23 @@ export const ImageContainer = styled.View`
     align-items: center;
 `;
 
+export const AvatarPlaceholder = styled.View`
+    width: 100%;
+    height: 100%;
+    border-radius: ${RFValue(99)}px;
+    background-color: ${(props) => props.theme.colors.avatar_bg};
+    justify-content: center;
+    align-items: center;
+`;
+
+// @ts-ignore
+export const AvatarText = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.bold};
+    font-size: ${RFValue(80)}px;
+    color: ${(props) => props.theme.colors.avatar_text};
+    text-align: center;
+`;
+
 // @ts-ignore
 export const SelectImageIcon = styled(RectButton)`
     width: ${RFValue(50)}px;
@@ -71,7 +88,7 @@ export const SelectImageIcon = styled(RectButton)`
 // @ts-ignore
 export const Icon = styled(Feather)`
    font-size: ${RFValue(20)}px;
-   color: ${(props) => props.theme.colors.shape};
+    color: ${({ theme }) => theme.base.white};
 `;
 
 export const Image = styled.Image`
@@ -80,16 +97,19 @@ export const Image = styled.Image`
     border-radius: ${RFValue(99)}px;
 `;
 
-export const Input = styled.TextInput`
+export const Input = styled.TextInput.attrs((props) => ({
+    placeholderTextColor: props.theme.base.placeholder,
+}))`
     height: ${RFValue(50)}px;
     padding: ${RFValue(10)}px;
     margin-bottom: ${RFValue(10)}px;
-    background-color: ${(props) => props.theme.colors.shape};
+    background-color: ${({ theme }) => theme.base.shape_secondary};
+    border: 1px solid ${({ theme }) => theme.base.shape_third};
     border-radius: 5px;
 
     font-family: ${({ theme }) => theme.fonts.regular};
     font-size: ${RFValue(14)}px;
-    color: ${(props) => props.theme.colors.text};
+    color: ${({ theme }) => theme.base.title};
 `;
 
 export const Error = styled.Text`
@@ -100,6 +120,35 @@ export const Error = styled.Text`
     margin-bottom: 7px;
 `;
 
+export const Section = styled.View`
+    margin-top: ${RFValue(24)}px;
+`;
+
+export const SectionTitle = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.medium};
+    font-size: ${RFValue(16)}px;
+    color: ${(props) => props.theme.colors.title};
+    margin-bottom: ${RFValue(12)}px;
+`;
+
+export const ThemeRow = styled.View`
+    width: 100%;
+    min-height: ${RFValue(56)}px;
+    border-radius: 5px;
+    padding: 0 ${RFValue(16)}px;
+    background-color: ${(props) => props.theme.colors.shape};
+    border: 1px solid ${(props) => props.theme.colors.secodary_light};
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+`;
+
+export const ThemeLabel = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.regular};
+    font-size: ${RFValue(14)}px;
+    color: ${(props) => props.theme.colors.title};
+`;
+
 export const Btn = styled.TouchableOpacity`
     width: 100%;
     padding: ${RFValue(16)}px;
@@ -108,12 +157,45 @@ export const Btn = styled.TouchableOpacity`
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    margin-bottom: ${RFValue(5)}px;
+    margin-bottom: ${RFValue(8)}px;
+`;
+
+export const BtnSecondary = styled.TouchableOpacity`
+    width: 100%;
+    padding: ${RFValue(16)}px;
+    border-radius: 5px;
+    background-color: ${(props) => props.theme.colors.shape};
+    border: 1px solid ${(props) => props.theme.colors.primary};
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: ${RFValue(8)}px;
+`;
+
+// @ts-ignore
+export const BtnIcon = styled(Feather)`
+    font-size: ${RFValue(20)}px;
+    color: ${({ theme }) => theme.base.white};
+    margin-right: ${RFValue(8)}px;
+`;
+
+// @ts-ignore
+export const BtnIconSecondary = styled(Feather)`
+    font-size: ${RFValue(20)}px;
+    color: ${(props) => props.theme.colors.primary};
+    margin-right: ${RFValue(8)}px;
 `;
 
 export const TitleBtn = styled.Text`
     text-align: center;
     font-family: ${({ theme }) => theme.fonts.medium};
     font-size: ${RFValue(14)}px;
-    color: ${(props) => props.theme.colors.shape}; 
+    color: ${({ theme }) => theme.base.white}; 
+`;
+
+export const TitleBtnSecondary = styled.Text`
+    text-align: center;
+    font-family: ${({ theme }) => theme.fonts.medium};
+    font-size: ${RFValue(14)}px;
+    color: ${(props) => props.theme.colors.primary}; 
 `;

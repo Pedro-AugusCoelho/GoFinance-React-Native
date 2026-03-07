@@ -15,17 +15,17 @@ export const Container = styled.View`
 `;
 export const Header = styled.View`
     width: 100%;
-    height: ${RFValue(115)}px;
+    height: ${RFValue(96)}px;
     background-color: ${(props) => props.theme.colors.primary};
     align-items: center;
 `;
 
 export const Title = styled.Text`
-    margin-top: ${getStatusBarHeight() + RFValue(37)}px;
+    margin-top: ${getStatusBarHeight() + RFValue(20)}px;
     padding-bottom: 18px;
     font-family: ${({ theme }) => theme.fonts.regular};
     font-size: ${RFValue(18)}px;
-    color: ${(props) => props.theme.colors.shape};
+    color: ${({ theme }) => theme.base.white};
 `;
 
 export const Content = styled.ScrollView``;
@@ -33,6 +33,21 @@ export const Content = styled.ScrollView``;
 export const ChartContainer = styled.View`
     width: 100%;
     align-items: center;
+`;
+
+export const EmptyContainer = styled.View`
+    width: 100%;
+    min-height: ${RFValue(220)}px;
+    justify-content: center;
+    align-items: center;
+    padding: 0 ${RFValue(12)}px;
+`;
+
+export const EmptyText = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.regular};
+    font-size: ${RFValue(16)}px;
+    color: ${(props) => props.theme.colors.text};
+    text-align: center;
 `;
 
 export const MonthSelect = styled.View`

@@ -15,17 +15,17 @@ export const Container = styled.View`
 
 export const Header = styled.View`
     width: 100%;
-    height: ${RFValue(115)}px;
+    height: ${RFValue(96)}px;
     background-color: ${(props) => props.theme.colors.primary};
     align-items: center;
 `;
 
 export const Title = styled.Text`
-    margin-top: ${getStatusBarHeight() + RFValue(37)}px;
+    margin-top: ${getStatusBarHeight() + RFValue(20)}px;
     padding-bottom: 18px;
     font-family: ${({ theme }) => theme.fonts.regular};
     font-size: ${RFValue(18)}px;
-    color: ${(props) => props.theme.colors.shape};
+    color: ${({ theme }) => theme.base.white};
 `;
 
 export const Category = styled.TouchableOpacity<CategoryProps>`
@@ -34,7 +34,7 @@ export const Category = styled.TouchableOpacity<CategoryProps>`
     flex-direction: row;
     align-items: center;
 
-    background-color: ${({isActive, theme}) => isActive === true ? theme.colors.secodary_light : theme.colors.background };
+    background-color: ${({isActive, theme}) => isActive === true ? theme.base.shape_secondary : theme.colors.background };
 `;
 
 export const Label = styled.Text`
@@ -46,12 +46,13 @@ export const Label = styled.Text`
 export const Icon = styled(Feather)`
     font-size:${RFValue(20)}px;
     margin-right: 16px;
+    color: ${(props) => props.theme.colors.text};
 `;
 
 export const Separator = styled.View`
     height: 1px;
     width: 100%;
-    border: 1px solid ${({ theme }) => theme.colors.text};
+    background-color: ${({ theme }) => theme.base.shape_third};
 `;
 
 export const Footer = styled.View`
@@ -64,11 +65,11 @@ export const Button = styled.TouchableOpacity`
     align-items: center;
     padding: ${RFValue(15)}px;
     border-radius: 5px;
-    background-color: ${(props) => props.theme.colors.secodary};
+    background-color: ${(props) => props.theme.colors.primary};
 `;
 
 export const FooterTitle = styled.Text`
     font-family: ${({ theme }) => theme.fonts.medium};
     font-size: ${RFValue(14)}px;
-    color: ${(props) => props.theme.colors.shape};
+    color: ${({ theme }) => theme.base.white};
 `;

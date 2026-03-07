@@ -1,7 +1,6 @@
 import React from "react";
 import { TouchableOpacityProps } from 'react-native';
 import { categories } from "../../../utils/categories";
-import { DataListProps } from "../../screens/Dashboard";
 import * as T from './styles';
 
 export interface TransactionDataProps {
@@ -12,6 +11,8 @@ export interface TransactionDataProps {
     amount: string;
     category: string;
     date: string;
+    installmentNumber?: number;
+    installmentTotal?: number;
 }
 
 interface TransactionCardProps {
@@ -21,11 +22,23 @@ interface TransactionCardProps {
 
 export function TransactionCard({ data, onPress }:TransactionCardProps) {
     const category = categories.filter(item => item.key === data.category)[0]
+    const hasInstallment = Boolean(
+        data.installmentTotal &&
+        data.installmentTotal > 1 &&
+        data.installmentNumber
+    )
     
     return(
         <T.Container onPress={() => onPress(data.id!)}>
             <T.Header>
-                <T.Title>{data.name}</T.Title>
+                <T.TitleRow>
+                    <T.Title numberOfLines={1} ellipsizeMode="tail">{data.name}</T.Title>
+                    {hasInstallment && (
+                        <T.InstallmentLabel>
+                            {`(${data.installmentNumber}/${data.installmentTotal})`}
+                        </T.InstallmentLabel>
+                    )}
+                </T.TitleRow>
                 <T.Amount type={data.type}>
                     {data.type === 'outcome' && '- '}
                     {data.value}

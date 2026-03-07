@@ -18,6 +18,7 @@ export function CategorySelect({category, closeSelectCategory, setCategory}:Cate
 
     function handleCategorySelect (category: Category) {
         setCategory(category)
+        closeSelectCategory()
     }
 
     return(
@@ -44,7 +45,7 @@ export function CategorySelect({category, closeSelectCategory, setCategory}:Cate
 
             <C.Footer>
                 <C.Button onPress={closeSelectCategory}>
-                    <C.FooterTitle>Selecionar</C.FooterTitle>
+                    <C.FooterTitle>Fechar</C.FooterTitle>
                 </C.Button>
             </C.Footer>
         </C.Container>

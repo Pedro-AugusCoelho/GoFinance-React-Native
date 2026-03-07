@@ -15,20 +15,37 @@ export const Container = styled.TouchableOpacity`
 
 export const Header = styled.View``;
 
+export const TitleRow = styled.View`
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+`;
+
 export const Title = styled.Text`
     font-family: ${({ theme }) => theme.fonts.regular};
     font-size: ${RFValue(14)}px;
     color: ${(props) => props.theme.colors.title};
+    flex: 1;
+    margin-right: 8px;
+`;
+
+export const InstallmentLabel = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.regular};
+    font-size: ${RFValue(12)}px;
+    color: ${(props) => props.theme.colors.text};
+    flex-shrink: 0;
 `;
 
 export const Amount = styled.Text<typeProps>`
     font-family: ${({ theme }) => theme.fonts.regular};
     font-size: ${RFValue(20)}px;
     color: ${({theme, type}) => type === 'income' ? theme.colors.success : theme.colors.attention};
+    margin-top: ${RFValue(4)}px;
 `;
 
 export const Footer = styled.View`
-    margin-top: ${RFValue(20)}px;
+    margin-top: ${RFValue(10)}px;
     flex-direction: row;
     justify-content: space-between;
 `;
