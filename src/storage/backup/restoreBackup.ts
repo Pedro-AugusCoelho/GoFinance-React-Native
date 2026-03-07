@@ -11,19 +11,18 @@ export async function restoreBackup() {
         })
 
         // VERIFICA SE O USUÁRIO CANCELOU
-        if (result.canceled) {
+        if (result.type === 'cancel') {
             return { success: false, message: 'Seleção de arquivo cancelada' }
         }
 
-        // @ts-ignore
-        const fileUri = result.assets ? result.assets[0].uri : result.uri
+        const fileUri = result.uri
 
         // LÊ O ARQUIVO SELECIONADO
         const backupString = await FileSystem.readAsStringAsync(fileUri, {
             encoding: FileSystem.EncodingType.UTF8,
         })
 
-        const backup = JSON.parse(backupString)
+        const backup = JSON.parse(backupString) as Record<string, string>
 
         // VALIDA SE O BACKUP TEM DADOS
         if (!backup || Object.keys(backup).length === 0) {
@@ -31,12 +30,11 @@ export async function restoreBackup() {
         }
 
         // CONVERTE O OBJETO DE BACKUP PARA O FORMATO ACEITO PELO ASYNCSTORAGE.MULTISET
-        const items = Object.keys(backup).map((key) => [key, backup[key]])
+        const items: [string, string][] = Object.keys(backup).map((key) => [key, String(backup[key])])
         
         // LIMPA O ASYNCSTORAGE ANTES DE RESTAURAR (OPCIONAL)
         // await AsyncStorage.clear()
         
-        // @ts-ignore
         await AsyncStorage.multiSet(items)
 
         return { success: true, message: 'Backup restaurado com sucesso!' }
