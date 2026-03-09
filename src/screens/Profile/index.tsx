@@ -7,12 +7,12 @@ import * as ImagePicker from 'expo-image-picker'
 
 import { useAuth } from "../../hooks/auth"
 import { useForm, Control, FieldValues, Controller } from "react-hook-form"
-import { TouchableWithoutFeedback, Keyboard, Alert, ActivityIndicator, Switch, KeyboardAvoidingView, Platform } from "react-native"
+import { Keyboard, Alert, ActivityIndicator, Switch, KeyboardAvoidingView, Platform } from "react-native"
 import { useCallback, useEffect, useState } from "react"
 import { useFocusEffect } from "@react-navigation/native"
 import { createBackup } from "../../storage/backup/createBackup"
 import { restoreBackup } from "../../storage/backup/restoreBackup"
-import { useTheme } from "styled-components"
+import { useTheme } from "styled-components/native"
 import { useAppTheme } from "../../hooks/theme"
 
 const schema = Yup.object().shape({
@@ -143,17 +143,16 @@ export function Profile() {
     }
         
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            >
-            {/* @ts-ignore */}
-            <P.Container
-                keyboardShouldPersistTaps="handled"
-                keyboardDismissMode="on-drag"
-                contentContainerStyle={{ flexGrow: 1 }}
-            >
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+        {/* @ts-ignore */}
+        <P.Container
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            contentContainerStyle={{ flexGrow: 1 }}
+        >
                 {/* @ts-ignore */}
                 <P.Header>
                     {/* @ts-ignore */}
@@ -266,7 +265,6 @@ export function Profile() {
                     </P.InputContainer>
                 </P.Body>
             </P.Container>
-            </KeyboardAvoidingView>
-        </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
     )
 }

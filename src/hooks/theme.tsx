@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { ThemeProvider } from 'styled-components'
+import { ThemeProvider } from 'styled-components/native'
 
 import { darkTheme, lightTheme } from '../global/styles/theme'
 import { getThemeMode } from '../storage/theme/getThemeMode'

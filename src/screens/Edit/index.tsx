@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Yup from "yup";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Control, Controller, FieldValues, useForm } from "react-hook-form";
-import { Alert, Keyboard, KeyboardAvoidingView, Modal, Platform, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
+import { Alert, Keyboard, KeyboardAvoidingView, Modal, Platform, TouchableOpacity } from "react-native";
 import { useRoute, useNavigation } from '@react-navigation/native';
 import * as R from './styles';
 import { CategorySelect } from "../CategorySelect";
@@ -286,13 +286,12 @@ export function Edit() {
     }
 
     return(
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            >
-            {/* @ts-ignore */}
-            <R.Container>
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+        {/* @ts-ignore */}
+        <R.Container>
                     {/* @ts-ignore */}
                     <R.Header>
                         <R.GoBack onPress={() => handleBackWindow()}>
@@ -412,7 +411,6 @@ export function Edit() {
                         />
                     </Modal>
             </R.Container>
-            </KeyboardAvoidingView>
-        </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
     )
 }

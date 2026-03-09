@@ -5,7 +5,7 @@ import { RootTabParamList } from "../../routes/app.routes"
 import * as Yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Control, Controller, FieldValues, useForm } from "react-hook-form"
-import { Modal, TouchableWithoutFeedback, Keyboard, Alert, Platform, TouchableOpacity, FlatList, KeyboardAvoidingView } from "react-native"
+import { Modal, Keyboard, Alert, Platform, TouchableOpacity, FlatList, KeyboardAvoidingView } from "react-native"
 import { useNavigation } from '@react-navigation/native'
 
 import * as R from './styles'
@@ -164,17 +164,16 @@ export function Register() {
     
 
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            >
-            {/* @ts-ignore */}
-            <R.Container
-                keyboardShouldPersistTaps="handled"
-                keyboardDismissMode="on-drag"
-                contentContainerStyle={{ flexGrow: 1 }}
-            >
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+        {/* @ts-ignore */}
+        <R.Container
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            contentContainerStyle={{ flexGrow: 1 }}
+        >
                 <R.Header>
                     {/* @ts-ignore */}
                     <R.Title>Cadastro</R.Title>
@@ -307,7 +306,6 @@ export function Register() {
                     </R.ModalOverlay>
                 </Modal>
             </R.Container>
-            </KeyboardAvoidingView>
-        </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
     )
 }

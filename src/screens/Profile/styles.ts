@@ -1,4 +1,3 @@
-import { RectButton } from "react-native-gesture-handler";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 import { RFValue } from "react-native-responsive-fontsize";
 import styled from "styled-components/native";
@@ -70,7 +69,7 @@ export const AvatarText = styled.Text`
 `;
 
 // @ts-ignore
-export const SelectImageIcon = styled(RectButton)`
+export const SelectImageIcon = styled.TouchableOpacity`
     width: ${RFValue(50)}px;
     height: ${RFValue(50)}px;
     border-radius: ${RFValue(25)}px;

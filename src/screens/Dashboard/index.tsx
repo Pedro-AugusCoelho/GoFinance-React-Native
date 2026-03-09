@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { ListRenderItemInfo } from 'react-native';
+import { ListRenderItemInfo, Platform, TouchableOpacity, Modal } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 import * as S from './styles';
 import { HighlightCard } from "../../components/HighlightCard";
 import { TransactionCard } from "../../components/TransactionCard";
 import { ActivityIndicator } from "react-native";
-import { useTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
 import { useNavigation } from '@react-navigation/native';
 import { propsStack } from "../../routes/stack.routes";
 import { getAllTransactions } from "../../storage/transaction/getAllTransaction";
@@ -37,21 +38,6 @@ interface TransactionListItem {
     installmentTotal?: number;
     status?: 'pending' | 'paid';
 }
-
-type FilterPeriod = '1m' | '3m' | '6m' | '9m' | '1y'
-
-interface FilterOption {
-    key: FilterPeriod;
-    label: string;
-}
-
-const FILTER_OPTIONS: FilterOption[] = [
-    { key: '1m', label: '1 mês' },
-    { key: '3m', label: '3 meses' },
-    { key: '6m', label: '6 meses' },
-    { key: '9m', label: '9 meses' },
-    { key: '1y', label: '1 ano' },
-]
 
 function parseTransactionValue(value: number | string) {
     const normalized = String(value)
@@ -89,8 +75,22 @@ function parseTransactionDate(value: string) {
 export function Dashboard() {
     const navigation: propsStack = useNavigation();
     const theme = useTheme();
-    const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('1m')
-    const [filterDirection, setFilterDirection] = useState<'forward' | 'backward'>('forward')
+    const [startDate, setStartDate] = useState(() => {
+        const date = new Date();
+        date.setDate(1); // Primeiro dia do mês atual
+        return date;
+    });
+    const [endDate, setEndDate] = useState(new Date());
+    const [tempStartDate, setTempStartDate] = useState(() => {
+        const date = new Date();
+        date.setDate(1);
+        return date;
+    });
+    const [tempEndDate, setTempEndDate] = useState(new Date());
+    const [showDateModal, setShowDateModal] = useState(false);
+    const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+    const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+    const [periodDirection, setPeriodDirection] = useState<'forward' | 'backward'>('forward');
     const [isLoading, setIsLoading] = useState(true);
     const [allTransactions, setAllTransactions] = useState<TransactionDTO[]>([]);
     const [data, setData] = useState<TransactionListItem[]>([]);
@@ -104,71 +104,74 @@ export function Dashboard() {
         })
     }
 
-    function getPeriodRange(period: FilterPeriod) {
-        const currentDate = new Date()
-        const isForward = filterDirection === 'forward'
-
-        if (period === '1m') {
-            const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
-            const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999)
-            return { startDate, endDate }
+    function handleStartDateChange (event: any, selectedDate?: Date) {
+        setShowStartDatePicker(Platform.OS === 'ios');
+        if (selectedDate) {
+            setTempStartDate(selectedDate);
         }
+    }
 
-        if (period === '3m') {
-            const startDate = isForward 
-                ? new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
-                : new Date(currentDate.getFullYear(), currentDate.getMonth() - 2, 1)
-            const endDate = isForward
-                ? new Date(currentDate.getFullYear(), currentDate.getMonth() + 3, 0, 23, 59, 59, 999)
-                : new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999)
-            return { startDate, endDate }
+    function handleEndDateChange (event: any, selectedDate?: Date) {
+        setShowEndDatePicker(Platform.OS === 'ios');
+        if (selectedDate) {
+            setTempEndDate(selectedDate);
         }
+    }
 
-        if (period === '6m') {
-            const startDate = isForward
-                ? new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
-                : new Date(currentDate.getFullYear(), currentDate.getMonth() - 5, 1)
-            const endDate = isForward
-                ? new Date(currentDate.getFullYear(), currentDate.getMonth() + 6, 0, 23, 59, 59, 999)
-                : new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999)
-            return { startDate, endDate }
+    function handleOpenDateModal() {
+        setTempStartDate(startDate);
+        setTempEndDate(endDate);
+        setShowDateModal(true);
+    }
+
+    function handleCloseDateModal() {
+        setShowDateModal(false);
+        setShowStartDatePicker(false);
+        setShowEndDatePicker(false);
+    }
+
+    function handleApplyDates() {
+        setStartDate(tempStartDate);
+        setEndDate(tempEndDate);
+        handleCloseDateModal();
+    }
+
+    function handleResetDates() {
+        const today = new Date();
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        setTempStartDate(firstDayOfMonth);
+        setTempEndDate(today);
+    }
+
+    function handleQuickPeriod(months: number) {
+        const today = new Date();
+        
+        if (periodDirection === 'forward') {
+            const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const end = new Date(today.getFullYear(), today.getMonth() + months, today.getDate());
+            setTempStartDate(start);
+            setTempEndDate(end);
+        } else {
+            const start = new Date(today.getFullYear(), today.getMonth() - months, today.getDate());
+            const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            setTempStartDate(start);
+            setTempEndDate(end);
         }
-
-        if (period === '9m') {
-            const startDate = isForward
-                ? new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
-                : new Date(currentDate.getFullYear(), currentDate.getMonth() - 8, 1)
-            const endDate = isForward
-                ? new Date(currentDate.getFullYear(), currentDate.getMonth() + 9, 0, 23, 59, 59, 999)
-                : new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999)
-            return { startDate, endDate }
-        }
-
-        const startDate = new Date(currentDate.getFullYear(), 0, 1)
-        const endDate = new Date(currentDate.getFullYear(), 11, 31, 23, 59, 59, 999)
-        return { startDate, endDate }
     }
 
     function formatPeriodLabel() {
-        const { startDate, endDate } = getPeriodRange(filterPeriod)
-        const startMonth = startDate.toLocaleDateString('pt-BR', { month: 'short' })
-        const endMonth = endDate.toLocaleDateString('pt-BR', { month: 'short' })
-        const startYear = startDate.getFullYear()
-        const endYear = endDate.getFullYear()
-        
-        if (filterPeriod === '1m') {
-            return `${startMonth.charAt(0).toUpperCase() + startMonth.slice(1)}/${String(startYear).slice(2)}`
-        }
-        
-        if (startYear === endYear) {
-            return `${startMonth.charAt(0).toUpperCase() + startMonth.slice(1)} - ${endMonth.charAt(0).toUpperCase() + endMonth.slice(1)}/${String(endYear).slice(2)}`
-        }
-        
-        return `${startMonth}/${String(startYear).slice(2)} - ${endMonth}/${String(endYear).slice(2)}`
+        const start = startDate.toLocaleDateString('pt-BR');
+        const end = endDate.toLocaleDateString('pt-BR');
+        return `${start} - ${end}`;
     }
 
     function getFilteredTransactions(transactions: TransactionDTO[]) {
-        const { startDate, endDate } = getPeriodRange(filterPeriod)
+        // Normalizar datas para início e fim do dia
+        const normalizedStartDate = new Date(startDate);
+        normalizedStartDate.setHours(0, 0, 0, 0);
+        
+        const normalizedEndDate = new Date(endDate);
+        normalizedEndDate.setHours(23, 59, 59, 999);
 
         return transactions
             .filter((transaction) => {
@@ -177,7 +180,7 @@ export function Dashboard() {
                     return false
                 }
 
-                return transactionDate >= startDate && transactionDate <= endDate
+                return transactionDate >= normalizedStartDate && transactionDate <= normalizedEndDate
             })
             .sort((a, b) => {
                 const dateA = parseTransactionDate(a.date)?.getTime() ?? 0
@@ -281,7 +284,7 @@ export function Dashboard() {
     useEffect(() => {
         const filteredTransactions = getFilteredTransactions(allTransactions)
         formatAndSetTransactions(filteredTransactions)
-    }, [allTransactions, filterPeriod, filterDirection])
+    }, [allTransactions, startDate, endDate])
 
     useFocusEffect(useCallback(() => {
         loadData()
@@ -352,29 +355,17 @@ export function Dashboard() {
                 <S.Transactions>
                     <S.TitleRow>
                         <S.Title>Listagem</S.Title>
-                        <S.PeriodLabel>{formatPeriodLabel()}</S.PeriodLabel>
                     </S.TitleRow>
 
-                    <S.FilterRow>
-                        <S.DirectionButton onPress={() => setFilterDirection(filterDirection === 'forward' ? 'backward' : 'forward')}>
-                            <S.DirectionIcon name={filterDirection === 'forward' ? 'arrow-right' : 'arrow-left'} />
-                        </S.DirectionButton>
-
-                        <S.FilterList
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                        >
-                            {FILTER_OPTIONS.map((option) => (
-                                <S.FilterButton
-                                    key={option.key}
-                                    active={filterPeriod === option.key}
-                                    onPress={() => setFilterPeriod(option.key)}
-                                >
-                                    <S.FilterText active={filterPeriod === option.key}>{option.label}</S.FilterText>
-                                </S.FilterButton>
-                            ))}
-                        </S.FilterList>
-                    </S.FilterRow>
+                    <S.DateRangeButton onPress={handleOpenDateModal}>
+                        <S.DateRangeButtonContent>
+                            <S.DateIcon name='calendar' />
+                            <S.DateRangeButtonText>
+                                {startDate.toLocaleDateString('pt-BR')} - {endDate.toLocaleDateString('pt-BR')}
+                            </S.DateRangeButtonText>
+                        </S.DateRangeButtonContent>
+                        <S.DateIcon name='chevron-down' />
+                    </S.DateRangeButton>
 
                     <S.TransactionsList
                         data={data}
@@ -387,6 +378,116 @@ export function Dashboard() {
                         )}
                     />
                 </S.Transactions>
+
+                <Modal visible={showDateModal} transparent animationType="slide">
+                    <S.ModalOverlay>
+                        <S.ModalCard>
+                            <S.ModalHeader>
+                                <S.ModalTitle>Selecionar Período</S.ModalTitle>
+                                <S.ModalClose onPress={handleCloseDateModal}>
+                                    <S.ModalCloseIcon name="x" />
+                                </S.ModalClose>
+                            </S.ModalHeader>
+
+                            <S.ModalContent>
+                                <S.DirectionToggle>
+                                    <S.DirectionLabel>Direção:</S.DirectionLabel>
+                                    <S.DirectionButtons>
+                                        <S.DirectionButton 
+                                            active={periodDirection === 'backward'}
+                                            onPress={() => setPeriodDirection('backward')}
+                                        >
+                                            <S.DirectionButtonIcon name='arrow-left' active={periodDirection === 'backward'} />
+                                            <S.DirectionButtonText active={periodDirection === 'backward'}>Passado</S.DirectionButtonText>
+                                        </S.DirectionButton>
+                                        
+                                        <S.DirectionButton 
+                                            active={periodDirection === 'forward'}
+                                            onPress={() => setPeriodDirection('forward')}
+                                        >
+                                            <S.DirectionButtonIcon name='arrow-right' active={periodDirection === 'forward'} />
+                                            <S.DirectionButtonText active={periodDirection === 'forward'}>Futuro</S.DirectionButtonText>
+                                        </S.DirectionButton>
+                                    </S.DirectionButtons>
+                                </S.DirectionToggle>
+
+                                <S.QuickPeriodSection>
+                                    <S.DateLabel>Atalhos:</S.DateLabel>
+                                    <S.QuickPeriodButtons>
+                                        <S.QuickPeriodButton onPress={() => handleQuickPeriod(3)}>
+                                            <S.QuickPeriodText>3 meses</S.QuickPeriodText>
+                                        </S.QuickPeriodButton>
+                                        
+                                        <S.QuickPeriodButton onPress={() => handleQuickPeriod(6)}>
+                                            <S.QuickPeriodText>6 meses</S.QuickPeriodText>
+                                        </S.QuickPeriodButton>
+                                        
+                                        <S.QuickPeriodButton onPress={() => handleQuickPeriod(9)}>
+                                            <S.QuickPeriodText>9 meses</S.QuickPeriodText>
+                                        </S.QuickPeriodButton>
+                                        
+                                        <S.QuickPeriodButton onPress={() => handleQuickPeriod(12)}>
+                                            <S.QuickPeriodText>1 ano</S.QuickPeriodText>
+                                        </S.QuickPeriodButton>
+                                    </S.QuickPeriodButtons>
+                                </S.QuickPeriodSection>
+
+                                <S.DateInputWrapper>
+                                    <S.DateLabel>Data inicial:</S.DateLabel>
+                                    <TouchableOpacity onPress={() => setShowStartDatePicker(true)}>
+                                        <S.DateInput>
+                                            <S.DateText>{tempStartDate.toLocaleDateString('pt-BR')}</S.DateText>
+                                            <S.DateIcon name='calendar' />
+                                        </S.DateInput>
+                                    </TouchableOpacity>
+                                </S.DateInputWrapper>
+
+                                <S.DateInputWrapper>
+                                    <S.DateLabel>Data final:</S.DateLabel>
+                                    <TouchableOpacity onPress={() => setShowEndDatePicker(true)}>
+                                        <S.DateInput>
+                                            <S.DateText>{tempEndDate.toLocaleDateString('pt-BR')}</S.DateText>
+                                            <S.DateIcon name='calendar' />
+                                        </S.DateInput>
+                                    </TouchableOpacity>
+                                </S.DateInputWrapper>
+
+                                {showStartDatePicker && (
+                                    <DateTimePicker
+                                        value={tempStartDate}
+                                        mode="date"
+                                        display={Platform.OS === 'android' ? 'spinner' : 'default'}
+                                        positiveButton={{ label: 'OK', textColor: theme.colors.primary }}
+                                        negativeButton={{ label: 'Cancelar', textColor: theme.colors.primary }}
+                                        onChange={handleStartDateChange}
+                                    />
+                                )}
+
+                                {showEndDatePicker && (
+                                    <DateTimePicker
+                                        value={tempEndDate}
+                                        mode="date"
+                                        display={Platform.OS === 'android' ? 'spinner' : 'default'}
+                                        positiveButton={{ label: 'OK', textColor: theme.colors.primary }}
+                                        negativeButton={{ label: 'Cancelar', textColor: theme.colors.primary }}
+                                        onChange={handleEndDateChange}
+                                    />
+                                )}
+
+                                <S.ModalButtons>
+                                    <S.ModalResetButton onPress={handleResetDates}>
+                                        <S.ResetIcon name='refresh-cw' />
+                                        <S.ModalButtonText>Resetar</S.ModalButtonText>
+                                    </S.ModalResetButton>
+
+                                    <S.ModalApplyButton onPress={handleApplyDates}>
+                                        <S.ModalApplyButtonText>Aplicar</S.ModalApplyButtonText>
+                                    </S.ModalApplyButton>
+                                </S.ModalButtons>
+                            </S.ModalContent>
+                        </S.ModalCard>
+                    </S.ModalOverlay>
+                </Modal>
             </S.Container>
         )
     }

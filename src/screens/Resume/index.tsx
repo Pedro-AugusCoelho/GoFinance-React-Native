@@ -5,7 +5,7 @@ import { ptBR } from 'date-fns/locale';
 import { VictoryPie } from "victory-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useTheme } from "styled-components";
+import { useTheme } from "styled-components/native";
 
 import * as R from './styles';
 

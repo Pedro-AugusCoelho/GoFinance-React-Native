@@ -72,6 +72,11 @@ coverage/
 # Android build artifacts
 *.apk
 *.aab
+android/app/build/
+android/build/
+
+# Documentation (auto-generated)
+BUILD.md
 
 # Editor/OS
 .vscode/

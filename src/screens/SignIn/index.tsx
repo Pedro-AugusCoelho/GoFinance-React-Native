@@ -11,7 +11,7 @@ import * as Yup from "yup";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Control, Controller, FieldValues, useForm } from "react-hook-form";
 import { propsStack } from "../../routes/stack.routes";
-import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from "react-native";
+import { Keyboard, KeyboardAvoidingView, Platform } from "react-native";
 
 const schema = Yup.object().shape({
     name: Yup
@@ -42,13 +42,12 @@ export function SignIn () {
     }
 
     return(
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            >
-            {/* @ts-ignore */}
-            <S.Container>
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+        {/* @ts-ignore */}
+        <S.Container>
                 {/* @ts-ignore */}
                 <S.Header>
                     {/* @ts-ignore */}
@@ -92,7 +91,6 @@ export function SignIn () {
                     </S.Float>
                 </S.Footer>
             </S.Container>
-            </KeyboardAvoidingView>
-        </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
     )
 }

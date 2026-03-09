@@ -1,5 +1,4 @@
 import { RFValue } from "react-native-responsive-fontsize";
-import { RectButton } from 'react-native-gesture-handler';
 import styled, { css } from "styled-components/native";
 import { Feather } from '@expo/vector-icons';
 
@@ -131,7 +130,7 @@ export const BtnContainer = styled.View`
     flex-direction: column;
 `;
 
-export const BtnSubmit = styled(RectButton)`
+export const BtnSubmit = styled.TouchableOpacity`
     flex-direction: row;
     width: 100%;
     align-items: center;
@@ -146,7 +145,7 @@ export const IconBtn = styled(Feather)`
     font-size: ${RFValue(20)}px;
 `;
 
-export const BtnDelete = styled(RectButton)`
+export const BtnDelete = styled.TouchableOpacity`
     flex-direction: row;
     width: 100%;
     align-items: center;
@@ -173,7 +172,7 @@ export const TextSubmit = styled.Text`
     color: ${({ theme }) => theme.base.white};
 `;
 
-export const Category = styled(RectButton)`
+export const Category = styled.TouchableOpacity`
     background-color: ${(props) => props.theme.colors.shape};
     width: 100%;
     padding: 18px;

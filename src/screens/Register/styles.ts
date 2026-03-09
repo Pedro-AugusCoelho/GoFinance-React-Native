@@ -1,6 +1,5 @@
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 import { RFValue } from "react-native-responsive-fontsize";
-import { RectButton } from 'react-native-gesture-handler';
 import styled, { css } from "styled-components/native";
 import { Feather } from '@expo/vector-icons';
 
@@ -112,7 +111,9 @@ export const Footer = styled.View`
 `;
 
 // @ts-ignore
-export const BtnSubmit = styled(RectButton)`
+export const BtnSubmit = styled.TouchableOpacity.attrs({
+    activeOpacity: 0.7
+})`
     flex-direction: row;
     width: 100%;
     align-items: center;
@@ -136,7 +137,9 @@ export const TextSubmit = styled.Text`
 `;
 
 // @ts-ignore
-export const Category = styled(RectButton)`
+export const Category = styled.TouchableOpacity.attrs({
+    activeOpacity: 0.7
+})`
     background-color: ${(props) => props.theme.colors.shape};
     width: 100%;
     padding: 18px;
