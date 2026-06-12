@@ -6,7 +6,7 @@ import { StatusBar } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { MainRoute } from './src/routes';
-import { useTheme } from 'styled-components/native';
+import { useTheme } from "styled-components";
 
 import {
   useFonts,

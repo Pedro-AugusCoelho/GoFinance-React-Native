@@ -1,5 +1,5 @@
 import React from "react";
-import { useTheme } from "styled-components/native";
+import { useTheme } from "styled-components";
 import { Alert, Platform, ToastAndroid, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
