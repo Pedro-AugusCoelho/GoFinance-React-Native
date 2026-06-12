@@ -7,6 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { Control, Controller, FieldValues, useForm } from "react-hook-form"
 import { Modal, Keyboard, Alert, Platform, TouchableOpacity, FlatList, KeyboardAvoidingView } from "react-native"
 import { useNavigation } from '@react-navigation/native'
+import { CurrencyInput } from "../../components/CurrencyInput"
 
 import * as R from './styles'
 import { categories } from "../../../utils/categories"
@@ -202,12 +203,11 @@ export function Register() {
                         <Controller
                             name='value'
                             control={formControl}
+                            defaultValue={0}
                             render={({ field: { onChange, value } }) => (
-                                <R.Input
+                                <CurrencyInput
                                     value={value}
-                                    keyboardType="numeric"
-                                    placeholder="Valor Total"
-                                    onChangeText={onChange}
+                                    onChangeValue={onChange}
                                 />
                             )}
                         />
