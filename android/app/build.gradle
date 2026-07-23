@@ -51,18 +51,18 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.gofinance"
+    namespace 'com.pedro_augus_coelho_costa.gofinance'
     
     buildFeatures {
         buildConfig true
     }
     
     defaultConfig {
-        applicationId "com.gofinance"
+        applicationId 'com.pedro_augus_coelho_costa.gofinance'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 11
-        versionName "1.3"
+        versionCode 1
+        versionName "1.3.0"
     }
 
     splits {

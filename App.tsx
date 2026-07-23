@@ -5,7 +5,7 @@ import 'react-native-gesture-handler';
 import { StatusBar } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { MainRoute } from './src/routes';
+import { MainRoute } from './src/app/navigation';
 import { useTheme } from "styled-components";
 
 import {
@@ -15,8 +15,8 @@ import {
   Poppins_700Bold
 } from '@expo-google-fonts/poppins'
 
-import { AuthProvider } from './src/hooks/auth';
-import { AppThemeProvider } from './src/hooks/theme';
+import { AuthProvider } from './src/modules/user/context/auth';
+import { AppThemeProvider } from './src/shared/theme/context';
 
 function AppContent() {
   const theme = useTheme()

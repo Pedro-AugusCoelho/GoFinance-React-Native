@@ -17,6 +17,15 @@
       "eas": {
         "projectId": "d1e03837-7a55-4f96-a1e8-c974eb97a1ac"
       }
+    },
+    "android": {
+      "package": "com.pedro_augus_coelho_costa.gofinance",
+      "versionCode": 1
+    },
+    "ios": {
+      "bundleIdentifier": "com.pedro_augus_coelho_costa.gofinance",
+      "buildNumber": "1",
+      "supportsTablet": true
     }
   }
 }
