@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import {
     Animated,
     ListRenderItemInfo,
@@ -48,7 +48,7 @@ interface TransactionListItem {
     status?: 'pending' | 'paid'
 }
 
-function AnimatedTransactionCard({ children, index }: { children: React.ReactNode; index: number }) {
+const AnimatedTransactionCard = React.memo(function AnimatedTransactionCard({ children, index }: { children: React.ReactNode; index: number }) {
     const opacity = React.useRef(new Animated.Value(0)).current
     const translateY = React.useRef(new Animated.Value(12)).current
 
@@ -74,7 +74,7 @@ function AnimatedTransactionCard({ children, index }: { children: React.ReactNod
             {children}
         </Animated.View>
     )
-}
+})
 
 export function Dashboard() {
     const navigation: AppStackNavigationProp = useNavigation()
@@ -113,6 +113,7 @@ export function Dashboard() {
     const [allTransactions, setAllTransactions] = useState<TransactionDTO[]>([])
 
     const [data, setData] = useState<TransactionListItem[]>([])
+    const [visibleLimit, setVisibleLimit] = useState(30)
     const dateRangeOpacity = useRef(new Animated.Value(1)).current
 
     useEffect(() => {
@@ -325,7 +326,7 @@ export function Dashboard() {
                 }
             })
 
-        setData(transactionsFormatted)
+        setData(transactionsFormatted.slice(0, visibleLimit))
 
         const incomeTransactions = transactions.filter(
             (transaction) => transaction.type === 'income',
@@ -422,15 +423,26 @@ export function Dashboard() {
         }
     }
 
-    useEffect(() => {
-        const filteredTransactions = filterTransactionsByPeriod(
+    const filteredTransactions = useMemo(() => filterTransactionsByPeriod(
             allTransactions,
             startDate,
             endDate,
-        )
+        ), [allTransactions, startDate, endDate])
+
+    useEffect(() => {
+        setVisibleLimit(30)
+    }, [allTransactions, startDate, endDate])
+
+    useEffect(() => {
 
         formatAndSetTransactions(filteredTransactions)
-    }, [allTransactions, startDate, endDate])
+    }, [filteredTransactions, visibleLimit])
+
+    function handleLoadMore() {
+        setVisibleLimit((currentLimit) => currentLimit + 30)
+    }
+
+    const hasMoreTransactions = data.length < filteredTransactions.length
 
     useFocusEffect(
         useCallback(() => {
@@ -453,6 +465,16 @@ export function Dashboard() {
         <S.Container>
             <S.TransactionsList
                 data={data}
+                initialNumToRender={10}
+                maxToRenderPerBatch={10}
+                updateCellsBatchingPeriod={50}
+                windowSize={7}
+                removeClippedSubviews={Platform.OS === 'android'}
+                ListFooterComponent={hasMoreTransactions ? (
+                    <S.LoadMoreButton onPress={handleLoadMore}>
+                        <S.LoadMoreText>Carregar mais lançamentos</S.LoadMoreText>
+                    </S.LoadMoreButton>
+                ) : null}
                 keyExtractor={(item: TransactionListItem) =>
                     String(item.id)
                 }

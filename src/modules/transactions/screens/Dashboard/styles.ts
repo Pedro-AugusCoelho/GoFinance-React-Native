@@ -422,3 +422,18 @@ export const ResetIcon = styled(Feather)`
     color: ${({ theme }) => theme.colors.title};
     margin-right: ${RFValue(6)}px;
 `
+
+export const LoadMoreButton = styled.TouchableOpacity`
+    align-self: center;
+    margin: ${RFValue(4)}px 0 ${RFValue(16)}px;
+    padding: ${RFValue(12)}px ${RFValue(18)}px;
+    border-radius: 8px;
+    background-color: ${({ theme }) => theme.colors.shape};
+    border: 1px solid ${({ theme }) => theme.colors.primary};
+`
+
+export const LoadMoreText = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.medium};
+    font-size: ${RFValue(13)}px;
+    color: ${({ theme }) => theme.colors.primary};
+`

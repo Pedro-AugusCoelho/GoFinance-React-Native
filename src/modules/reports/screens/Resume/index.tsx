@@ -70,16 +70,15 @@ export function Resume() {
             return acc + expensive.value
         },0);
 
+        const totalsByCategory = expensives.reduce<Record<string, number>>((totals, transaction) => {
+            totals[transaction.category] = (totals[transaction.category] ?? 0) + transaction.value
+            return totals
+        }, {})
+
         const totalByCategory: CategoryData[] = []
 
         categories.forEach(category => {
-            let CategorySum = 0;
-
-            expensives.forEach((expensives: TransactionDTO) => {
-                if (expensives.category === category.key) {
-                    CategorySum += expensives.value
-                }
-            })
+            const CategorySum = totalsByCategory[category.key] ?? 0
 
             const percentage = expensivesTotal > 0
                 ? CategorySum / expensivesTotal * 100

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { TouchableOpacityProps } from 'react-native';
 import { categories } from "../../../modules/transactions/domain/categories";
 import * as T from './styles';
@@ -20,7 +20,7 @@ interface TransactionCardProps {
     onPress: (id:string) => void;
 }
 
-export function TransactionCard({ data, onPress }:TransactionCardProps) {
+export const TransactionCard = memo(function TransactionCard({ data, onPress }:TransactionCardProps) {
     const category = categories.filter(item => item.key === data.category)[0]
     const hasInstallment = Boolean(
         data.installmentTotal &&
@@ -56,4 +56,4 @@ export function TransactionCard({ data, onPress }:TransactionCardProps) {
             </T.Footer>
         </T.Container>
     )
-}
+})

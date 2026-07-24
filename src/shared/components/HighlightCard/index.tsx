@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { Animated } from 'react-native';
 import * as C from './styles'
 
@@ -10,7 +10,7 @@ interface HighlightCardProps {
     color: string;
 }
 
-export function HighlightCard (
+export const HighlightCard = memo(function HighlightCard (
     {
         color,
         amount,
@@ -64,4 +64,4 @@ export function HighlightCard (
             </C.Footer>
         </C.Container>
     )
-}
+})
