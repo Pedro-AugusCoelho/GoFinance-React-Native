@@ -21,7 +21,7 @@ import { TransactionDTO } from '../../storage/transaction.dto'
 import { useAuth } from '../../../user/context/auth'
 import { filterTransactionsByPeriod } from '../../domain/transaction-filters'
 import { getErrorMessage } from '../../../../core/errors/app-error'
-import { parseTransactionDate } from '../../domain/transaction-date'
+import { getCurrentDate, parseTransactionDate } from '../../domain/transaction-date'
 
 interface HighlightDataProps {
     total: string
@@ -82,22 +82,22 @@ export function Dashboard() {
     const { user } = useAuth()
 
     const [startDate, setStartDate] = useState(() => {
-        const date = new Date()
+        const date = getCurrentDate()
         date.setDate(1)
 
         return date
     })
 
-    const [endDate, setEndDate] = useState(new Date())
+    const [endDate, setEndDate] = useState(getCurrentDate())
 
     const [tempStartDate, setTempStartDate] = useState(() => {
-        const date = new Date()
+        const date = getCurrentDate()
         date.setDate(1)
 
         return date
     })
 
-    const [tempEndDate, setTempEndDate] = useState(new Date())
+    const [tempEndDate, setTempEndDate] = useState(getCurrentDate())
 
     const [showDateModal, setShowDateModal] = useState(false)
     const [showStartDatePicker, setShowStartDatePicker] = useState(false)
@@ -192,7 +192,7 @@ export function Dashboard() {
     }
 
     function handleResetDates() {
-        const today = new Date()
+        const today = getCurrentDate()
 
         const firstDayOfMonth = new Date(
             today.getFullYear(),
@@ -206,7 +206,7 @@ export function Dashboard() {
     }
 
     function handleQuickPeriod(months: number) {
-        const today = new Date()
+        const today = getCurrentDate()
         setSelectedQuickPeriod(months)
 
         if (periodDirection === 'forward') {
@@ -302,7 +302,7 @@ export function Dashboard() {
                 })
 
                 const parsedDate =
-                    parseTransactionDate(item.date) ?? new Date()
+                    parseTransactionDate(item.date) ?? getCurrentDate()
 
                 const date = Intl.DateTimeFormat('pt-BR', {
                     day: '2-digit',

@@ -1,13 +1,14 @@
 import { getAllTransactions } from "./getAllTransactions"
 import { TransactionDTO } from "./transaction.dto"
+import { getCurrentDate } from '../domain/transaction-date'
 
 export async function getTransactionsByMonth(year?: number, month?: number) {
     const transactions: TransactionDTO[] = await getAllTransactions()
 
         // Se não for informado o ano, usa o ano atual
-        const targetYear = year || new Date().getFullYear()
+        const targetYear = year || getCurrentDate().getFullYear()
         // Se não for informado o mês, usa o mês atual (1-12)
-        const targetMonth = month !== undefined ? month : new Date().getMonth() + 1
+        const targetMonth = month !== undefined ? month : getCurrentDate().getMonth() + 1
 
         // Filtra as transações pelo ano e mês e ordena por data
         const filteredTransactions = transactions

@@ -10,6 +10,7 @@ import { CurrencyInput } from "../../../../shared/components/CurrencyInput"
 
 import * as R from './styles'
 import { categories } from "../../domain/categories"
+import { getCurrentDate } from '../../domain/transaction-date'
 import { createTransactionPlan } from '../../application/create-transaction-plan'
 
 import DateTimePicker from "@react-native-community/datetimepicker"
@@ -73,7 +74,7 @@ export function Register() {
     })
 
     const [showDatePicker, setShowDatePicker] = useState(false)
-    const [date, setDate] = useState(new Date())
+    const [date, setDate] = useState(getCurrentDate())
 
     function animateTypeButton(scale: Animated.Value, toValue: number) {
         Animated.spring(scale, {
@@ -146,7 +147,7 @@ export function Register() {
                 key: 'category',
                 name: 'Categoria',
             });
-            setDate(new Date());
+            setDate(getCurrentDate());
     
             navigation.navigate('Listagem');
         } catch (error: unknown) {
@@ -246,7 +247,7 @@ export function Register() {
                         {/* @ts-ignore */}
                         <R.BoxBtn>
                             {/* @ts-ignore */}
-                            <Animated.View style={{ flex: 1, transform: [{ scale: incomeButtonScale }] }}>
+                            <Animated.View style={{ flex: 1, minHeight: 58, transform: [{ scale: incomeButtonScale }] }}>
                                 <R.BtnSelected
                                     onPress={() => setTransactionType('income')}
                                     onPressIn={() => animateTypeButton(incomeButtonScale, 0.96)}
@@ -260,7 +261,7 @@ export function Register() {
                             </Animated.View>
 
                             {/* @ts-ignore */}
-                            <Animated.View style={{ flex: 1, transform: [{ scale: outcomeButtonScale }] }}>
+                            <Animated.View style={{ flex: 1, minHeight: 58, transform: [{ scale: outcomeButtonScale }] }}>
                                 <R.BtnSelected
                                     onPress={() => setTransactionType('outcome')}
                                     onPressIn={() => animateTypeButton(outcomeButtonScale, 0.96)}

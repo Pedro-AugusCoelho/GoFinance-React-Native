@@ -35,3 +35,22 @@ export function parseTransactionDate(value: string): Date | null {
     return Number.isNaN(parsed.getTime()) ? null : parsed
 }
 import { AppError } from '../../../core/errors/app-error'
+
+const FALLBACK_TIME_ZONE = 'America/Sao_Paulo'
+
+export function getCurrentDate(): Date {
+    const deviceTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || FALLBACK_TIME_ZONE
+    const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: deviceTimeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+    }).formatToParts(new Date())
+
+    const getPart = (type: string) => parts.find((part) => part.type === type)?.value
+    const year = Number(getPart('year'))
+    const month = Number(getPart('month'))
+    const day = Number(getPart('day'))
+
+    return new Date(year, month - 1, day)
+}

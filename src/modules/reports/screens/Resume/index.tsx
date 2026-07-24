@@ -15,6 +15,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { listTransactions } from "../../../transactions/application/list-transactions";
 import { TransactionDTO } from "../../../transactions/storage/transaction.dto";
 import { getErrorMessage } from '../../../../core/errors/app-error'
+import { getCurrentDate } from '../../../transactions/domain/transaction-date'
 
 
 interface CategoryData {
@@ -33,7 +34,7 @@ export function Resume() {
     const [isLoading, setIsLoading] = useState(false);
     const [ totalByCategories, setTotalByCategories ] = useState<CategoryData[]>([]);
     const [ totalExpenses, setTotalExpenses ] = useState(0);
-    const [ selectedDate , setSelectedDate ] = useState(new Date);
+    const [ selectedDate , setSelectedDate ] = useState(getCurrentDate);
     const theme = useTheme();
     const bottomTabBarHeight = useBottomTabBarHeight();
     const categoryColorsByKey: Record<string, string> = {

@@ -14,6 +14,7 @@ import { editTransactionPlan } from '../../application/edit-transaction-plan';
 import { deleteTransactionPlan } from '../../application/delete-transaction-plan';
 import { getErrorMessage } from '../../../../core/errors/app-error'
 import { CurrencyInput } from '../../../../shared/components/CurrencyInput'
+import { getCurrentDate } from '../../domain/transaction-date'
 
 interface FormData {
     name:string;
@@ -317,7 +318,7 @@ export function Edit() {
     
                                 {showDatePicker && (
                                     <DateTimePicker
-                                        value={date ?? new Date()}
+                                        value={date ?? getCurrentDate()}
                                         mode="date"
                                         display={Platform.OS === 'android' ? 'spinner' : 'default'}
                                         positiveButton={{ label: 'OK', textColor: '#00875F' }}
@@ -334,7 +335,7 @@ export function Edit() {
                             {/* @ts-ignore */}
                             <R.BoxBtn>
                                 {/* @ts-ignore */}
-                                <Animated.View style={{ flex: 1, transform: [{ scale: incomeButtonScale }] }}>
+                                <Animated.View style={{ flex: 1, minHeight: 58, transform: [{ scale: incomeButtonScale }] }}>
                                     <R.BtnSelected
                                         onPress={() => setTransactionType('income')}
                                         onPressIn={() => animateTypeButton(incomeButtonScale, 0.96)}
@@ -348,7 +349,7 @@ export function Edit() {
                                 </Animated.View>
 
                                 {/* @ts-ignore */}
-                                <Animated.View style={{ flex: 1, transform: [{ scale: outcomeButtonScale }] }}>
+                                <Animated.View style={{ flex: 1, minHeight: 58, transform: [{ scale: outcomeButtonScale }] }}>
                                     <R.BtnSelected
                                         onPress={() => setTransactionType('outcome')}
                                         onPressIn={() => animateTypeButton(outcomeButtonScale, 0.96)}
