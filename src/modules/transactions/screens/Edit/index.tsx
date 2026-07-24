@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import * as Yup from "yup";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Control, Controller, FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import { Alert, Keyboard, KeyboardAvoidingView, Modal, Platform, TouchableOpacity } from "react-native";
+import { ActivityIndicator, Alert, Animated, FlatList, KeyboardAvoidingView, Modal, Platform, TouchableOpacity } from "react-native";
 import { useRoute, useNavigation } from '@react-navigation/native';
 import * as R from './styles';
-import { CategorySelect } from "../../components/CategorySelect";
 import { EditRouteProp, AppStackNavigationProp } from "../../../../app/navigation/stack.routes";
 import { categories } from "../../domain/categories";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -14,19 +13,21 @@ import { listTransactions } from '../../application/list-transactions';
 import { editTransactionPlan } from '../../application/edit-transaction-plan';
 import { deleteTransactionPlan } from '../../application/delete-transaction-plan';
 import { getErrorMessage } from '../../../../core/errors/app-error'
-import { parseTransactionValue, roundCurrency } from '../../domain/transaction-money'
+import { CurrencyInput } from '../../../../shared/components/CurrencyInput'
 
 interface FormData {
     name:string;
-    value:string;
+    value:number;
 }
 
 const schema = Yup.object().shape({
     name: Yup
     .string()
+    .trim()
     .required('Nome é obrigátorio'),
     value: Yup
     .number()
+    .integer('Informe um valor válido')
     .typeError('Informe um valor númerico')
     .positive('Informe somente valores positivos')
     .required('Preço é obrigátorio')
@@ -55,12 +56,24 @@ export function Edit() {
     const [date, setDate] = useState<Date>();
     const [selectedTransaction, setSelectedTransaction] = useState<TransactionDTO | null>(null);
     const [transactionType, setTransactionType] = useState<'income' | 'outcome' | ''>('');
+    const [isSaving, setIsSaving] = useState(false)
+    const incomeButtonScale = useRef(new Animated.Value(1)).current
+    const outcomeButtonScale = useRef(new Animated.Value(1)).current
     const [modalCategory, setModalCategory] = useState(false);
     const [category, setCategory] = useState({
         key: 'category',
         name: 'Categoria',
     });
     const [showDatePicker, setShowDatePicker] = useState(false)
+
+    function animateTypeButton(scale: Animated.Value, toValue: number) {
+        Animated.spring(scale, {
+            toValue,
+            useNativeDriver: true,
+            speed: 24,
+            bounciness: 6,
+        }).start()
+    }
 
     useEffect(() => {
         async function handleFindParameter() {
@@ -73,7 +86,7 @@ export function Edit() {
              setId(params.id)
              setDate(new Date(located.date))
              setValue('name', located.name)
-             setValue('value', String(located.value))
+             setValue('value', located.value)
              setTransactionType(located.type)
              if (findCategory) {
                 setCategory({
@@ -109,31 +122,36 @@ export function Edit() {
             return
         }
 
-        const parsedValue = parseTransactionValue(form.value)
-        const value = parsedValue === null ? null : roundCurrency(parsedValue)
-        if (value === null) {
+        if (!Number.isInteger(form.value) || form.value <= 0) {
             Alert.alert('Valor inválido', 'Informe um valor válido.')
             return
         }
 
-        await editTransactionPlan({
-            id: params.id,
-            scope,
-            name: form.name,
-            value,
-            type: transactionType as 'income' | 'outcome',
-            category: category.key,
-            date,
-        })
+        setIsSaving(true)
+        try {
+            await editTransactionPlan({
+                id: params.id,
+                scope,
+                name: form.name.trim(),
+                valueCents: form.value,
+                type: transactionType as 'income' | 'outcome',
+                category: category.key,
+                date,
+            })
 
-        reset()
-        setTransactionType('')
-        setCategory({
-            key: 'category',
-            name: 'Categoria',
-        })
+            reset()
+            setTransactionType('')
+            setCategory({
+                key: 'category',
+                name: 'Categoria',
+            })
 
-        navigation.push('Home')
+            navigation.push('Home')
+        } catch (error: unknown) {
+            Alert.alert('Erro', getErrorMessage(error, 'Não foi possível salvar a alteração.'))
+        } finally {
+            setIsSaving(false)
+        }
     }
 
     function handleOpenCategoryModal() {
@@ -142,6 +160,14 @@ export function Edit() {
 
     function handleCloseCategoryModal() {
         setModalCategory(false)
+    }
+
+    function handleCategorySelect(item: typeof categories[number]) {
+        setCategory({
+            key: item.key,
+            name: item.name,
+        })
+        handleCloseCategoryModal()
     }
 
     function handleBackWindow () {
@@ -192,9 +218,12 @@ export function Edit() {
             return
         }
 
-        await deleteTransactionPlan(params.id, scope)
-
-        navigation.push('Home')
+        try {
+            await deleteTransactionPlan(params.id, scope)
+            navigation.push('Home')
+        } catch (error: unknown) {
+            Alert.alert('Erro', getErrorMessage(error, 'Não foi possível excluir a transação.'))
+        }
     }
 
     async function handleDeleteTransaction () {
@@ -271,11 +300,9 @@ export function Edit() {
                                 name='value'
                                 control={formControll}
                                 render={({ field: { onChange, value} }) => (
-                                    <R.Input
+                                    <CurrencyInput
                                         value={value}
-                                        keyboardType="numeric"
-                                        placeholder="Preço"
-                                        onChangeText={onChange}
+                                        onChangeValue={onChange}
                                     />
                                 )}
                             />
@@ -307,20 +334,43 @@ export function Edit() {
                             {/* @ts-ignore */}
                             <R.BoxBtn>
                                 {/* @ts-ignore */}
-                                <R.BtnSelected onPress={() => setTransactionType('income')} isActive={transactionType === 'income'} type={transactionType}>
-                                    <R.Icon name='arrow-up-circle' type='income'/>
-                                    <R.TextBtn>Entrada</R.TextBtn>
-                                </R.BtnSelected>
+                                <Animated.View style={{ flex: 1, transform: [{ scale: incomeButtonScale }] }}>
+                                    <R.BtnSelected
+                                        onPress={() => setTransactionType('income')}
+                                        onPressIn={() => animateTypeButton(incomeButtonScale, 0.96)}
+                                        onPressOut={() => animateTypeButton(incomeButtonScale, 1)}
+                                        isActive={transactionType === 'income'}
+                                        type={transactionType}
+                                    >
+                                        <R.Icon name='arrow-up-circle' type='income'/>
+                                        <R.TextBtn>Entrada</R.TextBtn>
+                                    </R.BtnSelected>
+                                </Animated.View>
 
                                 {/* @ts-ignore */}
-                                <R.BtnSelected onPress={() => setTransactionType('outcome')} isActive={transactionType === 'outcome'} type={transactionType}>
-                                    <R.Icon name='arrow-down-circle' type='outcome'/>
-                                    <R.TextBtn>Saída</R.TextBtn>
-                                </R.BtnSelected>
+                                <Animated.View style={{ flex: 1, transform: [{ scale: outcomeButtonScale }] }}>
+                                    <R.BtnSelected
+                                        onPress={() => setTransactionType('outcome')}
+                                        onPressIn={() => animateTypeButton(outcomeButtonScale, 0.96)}
+                                        onPressOut={() => animateTypeButton(outcomeButtonScale, 1)}
+                                        isActive={transactionType === 'outcome'}
+                                        type={transactionType}
+                                    >
+                                        <R.Icon name='arrow-down-circle' type='outcome'/>
+                                        <R.TextBtn>Saída</R.TextBtn>
+                                    </R.BtnSelected>
+                                </Animated.View>
                             </R.BoxBtn>
 
                             <R.Category onPress={handleOpenCategoryModal}>
-                                <R.CategoryTitle>{category.name}</R.CategoryTitle>
+                                <R.CategoryInfo>
+                                    {category.key !== 'category' && (
+                                        <R.CategorySelectedIcon
+                                            name={categories.find(item => item.key === category.key)?.icon as React.ComponentProps<typeof R.CategorySelectedIcon>['name']}
+                                        />
+                                    )}
+                                    <R.CategoryTitle>{category.name}</R.CategoryTitle>
+                                </R.CategoryInfo>
                                 <R.CategoryIcon name='chevron-down' />
                             </R.Category>
 
@@ -328,24 +378,55 @@ export function Edit() {
 
                         {/* @ts-ignore */}
                         <R.BtnContainer>
+                            <R.BtnSubmit
+                                onPress={handleSubmit(handleEdit as unknown as SubmitHandler<FieldValues>)}
+                                disabled={isSaving}
+                            >
+                                {isSaving ? (
+                                    <ActivityIndicator color="#FFFFFF" />
+                                ) : (
+                                    <>
+                                        <R.IconBtn name='save' />
+                                        <R.TextSubmit>Salvar</R.TextSubmit>
+                                    </>
+                                )}
+                            </R.BtnSubmit>
                             <R.BtnDelete onPress={() => handleDeleteTransaction()}>
-                                <R.IconBtn name='trash' />
+                                <R.IconDelete name='trash-2' />
                                 <R.TextDelete>Deletar</R.TextDelete>
                             </R.BtnDelete>
-
-        <R.BtnSubmit onPress={handleSubmit(handleEdit as unknown as SubmitHandler<FieldValues>)}>
-                                <R.IconBtn name='save' />
-                                <R.TextSubmit>Salvar</R.TextSubmit>
-                            </R.BtnSubmit>
                         </R.BtnContainer>
                     </R.Body>
 
-                    <Modal visible={modalCategory}>
-                        <CategorySelect
-                            category={category}
-                            setCategory={setCategory}
-                            closeSelectCategory={handleCloseCategoryModal}
-                        />
+                    <Modal visible={modalCategory} transparent animationType="slide">
+                        <R.ModalOverlay>
+                            <R.ModalCard>
+                                <R.ModalHeader>
+                                    <R.ModalTitle>Selecione a categoria</R.ModalTitle>
+                                    <R.ModalClose onPress={handleCloseCategoryModal}>
+                                        <R.ModalCloseIcon name="x" />
+                                    </R.ModalClose>
+                                </R.ModalHeader>
+
+                                <FlatList
+                                    data={categories}
+                                    keyExtractor={(item) => item.key}
+                                    showsVerticalScrollIndicator={false}
+                                    renderItem={({ item }) => (
+                                        <R.ModalCategoryItem
+                                            onPress={() => handleCategorySelect(item)}
+                                            isActive={category.key === item.key}
+                                        >
+                                            <R.ModalCategoryIcon
+                                                name={item.icon as React.ComponentProps<typeof R.ModalCategoryIcon>['name']}
+                                            />
+                                            <R.ModalCategoryText>{item.name}</R.ModalCategoryText>
+                                        </R.ModalCategoryItem>
+                                    )}
+                                    ItemSeparatorComponent={() => <R.ModalSeparator />}
+                                />
+                            </R.ModalCard>
+                        </R.ModalOverlay>
                     </Modal>
             </R.Container>
         </KeyboardAvoidingView>

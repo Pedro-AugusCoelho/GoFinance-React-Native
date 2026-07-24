@@ -22,7 +22,7 @@ describe('transaction use cases', () => {
 
         await createTransactionPlan({
             name: 'Compra',
-            totalValue: 100,
+            totalValueCents: 10000,
             installments: 2,
             type: 'outcome',
             category: 'purchases',
@@ -42,7 +42,7 @@ describe('transaction use cases', () => {
         const transactions: TransactionDTO[] = [1, 2, 3].map((number) => ({
             id: `id-${number}`,
             name: `Compra - 0${number}/3`,
-            value: 10,
+            value: 1000,
             amount: 3,
             type: 'outcome',
             category: 'purchases',
@@ -57,7 +57,7 @@ describe('transaction use cases', () => {
             id: 'id-2',
             scope: 'future',
             name: 'Compra alterada',
-            value: 12.5,
+            valueCents: 1250,
             type: 'outcome',
             category: 'food',
             date: new Date('2026-02-20T12:00:00.000Z'),
@@ -65,14 +65,14 @@ describe('transaction use cases', () => {
 
         expect(getData()[0].name).toBe('Compra - 01/3')
         expect(getData()[1].name).toBe('Compra alterada')
-        expect(getData()[2].value).toBe(12.5)
+        expect(getData()[2].value).toBe(1250)
     })
 
     it('deletes all installments when requested', async () => {
         const transactions: TransactionDTO[] = [
-            { id: 'id-1', name: 'A', value: 10, amount: 2, type: 'outcome', category: 'food', date: '2026-01-01', planId: 'plan-1', installmentNumber: 1 },
-            { id: 'id-2', name: 'B', value: 10, amount: 2, type: 'outcome', category: 'food', date: '2026-02-01', planId: 'plan-1', installmentNumber: 2 },
-            { id: 'id-3', name: 'C', value: 5, amount: 1, type: 'income', category: 'salary', date: '2026-01-01' },
+            { id: 'id-1', name: 'A', value: 1000, amount: 2, type: 'outcome', category: 'food', date: '2026-01-01', planId: 'plan-1', installmentNumber: 1 },
+            { id: 'id-2', name: 'B', value: 1000, amount: 2, type: 'outcome', category: 'food', date: '2026-02-01', planId: 'plan-1', installmentNumber: 2 },
+            { id: 'id-3', name: 'C', value: 500, amount: 1, type: 'income', category: 'salary', date: '2026-01-01' },
         ]
         const { repository, getData } = createRepository(transactions)
 

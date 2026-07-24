@@ -127,15 +127,18 @@ export const TextBtn = styled.Text`
 `;
 
 export const BtnContainer = styled.View`
-    flex-direction: column;
+    flex-direction: row;
+    align-items: stretch;
+    gap: ${RFValue(10)}px;
 `;
 
 export const BtnSubmit = styled.TouchableOpacity`
+    flex: 1;
     flex-direction: row;
-    width: 100%;
     align-items: center;
     justify-content: center;
-    padding: ${RFValue(15)}px;
+    min-height: ${RFValue(54)}px;
+    padding: ${RFValue(12)}px;
     border-radius: 8px;
     background-color: ${(props) => props.theme.colors.primary};
 `;
@@ -143,32 +146,36 @@ export const BtnSubmit = styled.TouchableOpacity`
 export const IconBtn = styled(Feather)`
     color: ${({ theme }) => theme.base.white};
     font-size: ${RFValue(20)}px;
+    margin-right: ${RFValue(8)}px;
 `;
 
 export const BtnDelete = styled.TouchableOpacity`
+    flex: 1;
     flex-direction: row;
-    width: 100%;
     align-items: center;
     justify-content: center;
-    padding: ${RFValue(15)}px;
+    min-height: ${RFValue(54)}px;
+    padding: ${RFValue(12)}px;
     border-radius: 8px;
-    background-color: ${(props) => props.theme.colors.attention};
-    margin-bottom: ${RFValue(16)}px;
+    border: 1px solid ${(props) => props.theme.colors.attention};
+    background-color: ${(props) => props.theme.base.transparent};
+`;
+
+export const IconDelete = styled(Feather)`
+    color: ${({ theme }) => theme.colors.attention};
+    font-size: ${RFValue(20)}px;
+    margin-right: ${RFValue(8)}px;
 `;
 
 export const TextDelete = styled.Text`
-    flex: auto;
-    text-align: center;
     font-family: ${({ theme }) => theme.fonts.medium};
-    font-size: ${RFValue(14)}px;
-    color: ${({ theme }) => theme.base.white};
+    font-size: ${RFValue(13)}px;
+    color: ${({ theme }) => theme.colors.attention};
 `;
 
 export const TextSubmit = styled.Text`
-    flex: auto;
-    text-align: center;
     font-family: ${({ theme }) => theme.fonts.medium};
-    font-size: ${RFValue(14)}px;
+    font-size: ${RFValue(13)}px;
     color: ${({ theme }) => theme.base.white};
 `;
 
@@ -180,6 +187,11 @@ export const Category = styled.TouchableOpacity`
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+`;
+
+export const CategoryInfo = styled.View`
+    flex-direction: row;
+    align-items: center;
 `;
 
 export const CategoryTitle = styled.Text`
@@ -198,4 +210,85 @@ export const Error = styled.Text`
     color: ${(props) => props.theme.colors.attention};
 
     margin-bottom: 7px;
+`;
+
+export const CategorySelectedIcon = styled(Feather)`
+    font-size: ${RFValue(20)}px;
+    margin-right: ${RFValue(12)}px;
+    color: ${(props) => props.theme.colors.text};
+`;
+
+export const ModalOverlay = styled.View`
+    flex: 1;
+    background-color: rgba(0, 0, 0, 0.45);
+    justify-content: flex-end;
+`;
+
+export const ModalCard = styled.View`
+    width: 100%;
+    max-height: 70%;
+    background-color: ${({ theme }) => theme.base.shape_primary};
+    border-top-left-radius: ${RFValue(18)}px;
+    border-top-right-radius: ${RFValue(18)}px;
+    padding: ${RFValue(16)}px;
+`;
+
+export const ModalHeader = styled.View`
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: ${RFValue(12)}px;
+`;
+
+export const ModalTitle = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.medium};
+    font-size: ${RFValue(16)}px;
+    color: ${({ theme }) => theme.colors.title};
+`;
+
+export const ModalClose = styled.TouchableOpacity`
+    width: ${RFValue(32)}px;
+    height: ${RFValue(32)}px;
+    border-radius: ${RFValue(16)}px;
+    align-items: center;
+    justify-content: center;
+    background-color: ${({ theme }) => theme.base.shape_secondary};
+`;
+
+export const ModalCloseIcon = styled(Feather)`
+    font-size: ${RFValue(16)}px;
+    color: ${({ theme }) => theme.colors.title};
+`;
+
+interface ModalCategoryItemProps {
+    isActive: boolean;
+}
+
+export const ModalCategoryItem = styled.TouchableOpacity<ModalCategoryItemProps>`
+    width: 100%;
+    min-height: ${RFValue(52)}px;
+    border-radius: ${RFValue(8)}px;
+    padding: 0 ${RFValue(12)}px;
+    flex-direction: row;
+    align-items: center;
+    background-color: ${({ isActive, theme }) =>
+        isActive ? theme.base.shape_secondary : theme.base.transparent};
+`;
+
+export const ModalCategoryIcon = styled(Feather)`
+    font-size: ${RFValue(18)}px;
+    color: ${({ theme }) => theme.colors.text};
+    margin-right: ${RFValue(12)}px;
+`;
+
+export const ModalCategoryText = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.regular};
+    font-size: ${RFValue(15)}px;
+    color: ${({ theme }) => theme.colors.title};
+`;
+
+export const ModalSeparator = styled.View`
+    width: 100%;
+    height: 1px;
+    background-color: ${({ theme }) => theme.base.shape_third};
 `;

@@ -9,7 +9,6 @@ import { useTheme } from "styled-components/native";
 
 import * as R from './styles';
 
-import { HistoryCard } from "../../../../shared/components/HistoryCard";
 import { categories } from "../../../transactions/domain/categories";
 import { ActivityIndicator, Alert } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
@@ -25,12 +24,15 @@ interface CategoryData {
     totalFormatted: string;
     color: string;
     percent: string;
+    percentage: number;
+    icon: string;
 }
 
 export function Resume() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [ totalByCategories, setTotalByCategories ] = useState<CategoryData[]>([]);
+    const [ totalExpenses, setTotalExpenses ] = useState(0);
     const [ selectedDate , setSelectedDate ] = useState(new Date);
     const theme = useTheme();
     const bottomTabBarHeight = useBottomTabBarHeight();
@@ -69,35 +71,42 @@ export function Resume() {
 
         const totalByCategory: CategoryData[] = []
 
-        categories.forEach(categories => {
+        categories.forEach(category => {
             let CategorySum = 0;
 
             expensives.forEach((expensives: TransactionDTO) => {
-                if (expensives.category === categories.key) {
+                if (expensives.category === category.key) {
                     CategorySum += expensives.value
                 }
             })
 
-            const percent = `${(CategorySum / expensivesTotal * 100).toFixed(0)}%`;
+            const percentage = expensivesTotal > 0
+                ? CategorySum / expensivesTotal * 100
+                : 0
+            const percent = `${percentage.toFixed(0)}%`;
 
             if (CategorySum > 0) {
                 totalByCategory.push({
-                    key: categories.key,
-                    name: categories.name,
+                    key: category.key,
+                    name: category.name,
                     total: CategorySum,
-                    totalFormatted: CategorySum.toLocaleString('pt-BR', {
+                    totalFormatted: (CategorySum / 100).toLocaleString('pt-BR', {
                         style: 'currency',
                         currency: 'BRL'
                     }),
                     percent,
-                    color: categoryColorsByKey[categories.key] ?? theme.colors.primary
+                    percentage,
+                    icon: category.icon,
+                    color: categoryColorsByKey[category.key] ?? category.color ?? theme.colors.primary
                 })
             }
         })
 
-        setTotalByCategories(totalByCategory)
+        setTotalExpenses(expensivesTotal)
+        setTotalByCategories(totalByCategory.sort((a, b) => b.total - a.total))
         } catch (error: unknown) {
             setTotalByCategories([])
+            setTotalExpenses(0)
             Alert.alert('Erro', getErrorMessage(error, 'Não foi possível carregar o resumo.'))
         } finally {
             setIsLoading(false)
@@ -148,6 +157,7 @@ export function Resume() {
                                     <VictoryPie 
                                         data={totalByCategories}
                                         colorScale={totalByCategories.map(item => item.color)}
+                                        labels={() => ''}
                                         style={{
                                             labels: {
                                                 fontSize: RFValue(18),
@@ -156,15 +166,38 @@ export function Resume() {
                                             },
                                         }}
                                         labelRadius={50}
+                                        innerRadius={55}
                                         x='percent'
                                         y='total'
                                     />
                                 </R.ChartContainer>
-                                {
-                                    totalByCategories.map((item) => (
-                                        <HistoryCard key={item.key} color={item.color} title={item.name} amount={item.totalFormatted} />
-                                    ))
-                                }
+
+                                <R.SectionHeader>
+                                    <R.SectionTitle>Gastos por categoria</R.SectionTitle>
+                                    <R.SectionTotal>
+                                        { (totalExpenses / 100).toLocaleString('pt-BR', {
+                                            style: 'currency',
+                                            currency: 'BRL'
+                                        }) }
+                                    </R.SectionTotal>
+                                </R.SectionHeader>
+                                {totalByCategories.map((item) => (
+                                    <R.CategoryRow key={item.key}>
+                                        <R.CategoryHeader>
+                                            <R.CategoryInfo>
+                                                <R.CategoryIcon
+                                                    name={item.icon as React.ComponentProps<typeof R.CategoryIcon>['name']}
+                                                />
+                                                <R.CategoryName>{item.name}</R.CategoryName>
+                                            </R.CategoryInfo>
+                                            <R.CategoryAmount>{item.totalFormatted}</R.CategoryAmount>
+                                        </R.CategoryHeader>
+                                        <R.ProgressTrack>
+                                            <R.ProgressFill color={item.color} widthPercent={item.percentage} />
+                                        </R.ProgressTrack>
+                                        <R.CategoryPercent>{item.percent} do total</R.CategoryPercent>
+                                    </R.CategoryRow>
+                                ))}
                             </>
                         ) : (
                             <R.EmptyContainer>

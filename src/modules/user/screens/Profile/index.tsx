@@ -7,8 +7,8 @@ import * as ImagePicker from 'expo-image-picker'
 
 import { useAuth } from "../../context/auth"
 import { useForm, Control, FieldValues, Controller } from "react-hook-form"
-import { Keyboard, Alert, ActivityIndicator, Switch, KeyboardAvoidingView, Platform } from "react-native"
-import { useCallback, useEffect, useState } from "react"
+import { Animated, Keyboard, Alert, ActivityIndicator, KeyboardAvoidingView, Platform } from "react-native"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useFocusEffect } from "@react-navigation/native"
 import { createBackup } from "../../../backup/storage/createBackup"
 import { restoreBackup } from "../../../backup/storage/restoreBackup"
@@ -30,6 +30,30 @@ export function Profile() {
     const theme = useTheme()
     const [isLoadingBackup, setIsLoadingBackup] = useState(false)
     const [isLoadingRestore, setIsLoadingRestore] = useState(false)
+    const themeToggleProgress = useRef(new Animated.Value(isDark ? 1 : 0)).current
+    const photoOpacity = useRef(new Animated.Value(1)).current
+
+    useEffect(() => {
+        Animated.spring(themeToggleProgress, {
+            toValue: isDark ? 1 : 0,
+            useNativeDriver: false,
+            speed: 14,
+            bounciness: 5,
+        }).start()
+    }, [isDark, themeToggleProgress])
+
+    useEffect(() => {
+        if (!user?.photo) {
+            return
+        }
+
+        photoOpacity.setValue(0)
+        Animated.timing(photoOpacity, {
+            toValue: 1,
+            duration: 320,
+            useNativeDriver: true,
+        }).start()
+    }, [user?.photo, photoOpacity])
 
     const {
         control,
@@ -178,7 +202,10 @@ export function Profile() {
                                 </P.SelectImageIcon>
                                 
                                 {user!.photo ? (
-                                    <P.Image source={{ uri: user!.photo }}/>
+                                    <P.AnimatedImage
+                                        source={{ uri: user!.photo }}
+                                        style={{ opacity: photoOpacity }}
+                                    />
                                 ) : (
                                     <P.AvatarPlaceholder>
                                         {/* @ts-ignore */}
@@ -222,12 +249,31 @@ export function Profile() {
                                     {isDark ? 'Modo escuro ativo' : 'Modo claro ativo'}
                                 </P.ThemeLabel>
 
-                                <Switch
-                                    value={isDark}
-                                    onValueChange={toggleTheme}
-                                    trackColor={{ false: theme.colors.text, true: theme.colors.primary }}
-                                    thumbColor={theme.colors.shape}
-                                />
+                                <P.ThemeSwitchTrack
+                                    style={{
+                                        backgroundColor: themeToggleProgress.interpolate({
+                                            inputRange: [0, 1],
+                                            outputRange: [theme.colors.text, theme.colors.primary],
+                                        }),
+                                    }}
+                                >
+                                    <P.ThemeSwitch
+                                        onPress={toggleTheme}
+                                        accessibilityRole="switch"
+                                        accessibilityState={{ checked: isDark }}
+                                    >
+                                        <P.ThemeSwitchThumb
+                                            style={{
+                                                transform: [{
+                                                    translateX: themeToggleProgress.interpolate({
+                                                        inputRange: [0, 1],
+                                                        outputRange: [0, 18],
+                                                    }),
+                                                }],
+                                            }}
+                                        />
+                                    </P.ThemeSwitch>
+                                </P.ThemeSwitchTrack>
                             </P.ThemeRow>
                         </P.Section>
 

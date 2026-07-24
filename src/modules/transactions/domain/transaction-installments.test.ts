@@ -4,7 +4,7 @@ describe('createInstallmentPlan', () => {
     it('distributes cents so the installments preserve the total value', () => {
         const transactions = createInstallmentPlan({
             name: 'Compra',
-            totalValue: 100,
+            totalValueCents: 10000,
             installments: 3,
             type: 'outcome',
             category: 'purchases',
@@ -15,8 +15,8 @@ describe('createInstallmentPlan', () => {
             })(),
         })
 
-        expect(transactions.map(({ value }) => value)).toEqual([33.34, 33.33, 33.33])
-        expect(transactions.reduce((total, { value }) => total + value, 0)).toBe(100)
+        expect(transactions.map(({ value }) => value)).toEqual([3334, 3333, 3333])
+        expect(transactions.reduce((total, { value }) => total + value, 0)).toBe(10000)
         expect(transactions.map(({ installmentNumber }) => installmentNumber)).toEqual([1, 2, 3])
     })
 })

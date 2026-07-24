@@ -67,11 +67,13 @@ export const BoxBtn = styled.View`
     width: 100%;
     justify-content: space-between;
     flex-direction: row;
+    gap: ${RFValue(10)}px;
     margin-bottom: 16px;
 `;
 
 export const BtnSelected = styled.TouchableOpacity<typeRegisterSelectedProps>`
-    width: 48%;
+    flex: 1;
+    min-height: ${RFValue(58)}px;
     align-items: center;
     justify-content: center;
     flex-direction: row;
@@ -147,6 +149,11 @@ export const Category = styled.TouchableOpacity.attrs({
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+`;
+
+export const CategoryInfo = styled.View`
+    flex-direction: row;
+    align-items: center;
 `;
 
 export const CategoryTitle = styled.Text`
@@ -237,4 +244,10 @@ export const ModalSeparator = styled.View`
     width: 100%;
     height: 1px;
     background-color: ${({ theme }) => theme.base.shape_third};
+`;
+
+export const CategorySelectedIcon = styled(Feather)`
+    font-size: ${RFValue(20)}px;
+    margin-right: ${RFValue(12)}px;
+    color: ${(props) => props.theme.colors.text};
 `;

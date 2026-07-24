@@ -326,22 +326,22 @@ export const QuickPeriodButtons = styled.View`
     gap: ${RFValue(8)}px;
 `
 
-export const QuickPeriodButton = styled.TouchableOpacity`
+export const QuickPeriodButton = styled.TouchableOpacity<{ active: boolean }>`
     flex: 1;
     height: ${RFValue(40)}px;
-    background-color: ${({ theme }) =>
-        theme.base.shape_secondary};
-    border: 1px solid ${({ theme }) =>
-        theme.base.shape_third};
+    background-color: ${({ active, theme }) =>
+        active ? theme.colors.primary : theme.base.shape_secondary};
+    border: 1px solid ${({ active, theme }) =>
+        active ? theme.colors.primary : theme.base.shape_third};
     border-radius: 6px;
     align-items: center;
     justify-content: center;
 `
 
-export const QuickPeriodText = styled.Text`
+export const QuickPeriodText = styled.Text<{ active?: boolean }>`
     font-family: ${({ theme }) => theme.fonts.medium};
     font-size: ${RFValue(12)}px;
-    color: ${({ theme }) => theme.colors.title};
+    color: ${({ active, theme }) => active ? theme.base.white : theme.colors.title};
 `
 
 export const DateInputWrapper = styled.View`
@@ -395,20 +395,20 @@ export const ModalResetButton = styled.TouchableOpacity`
     justify-content: center;
 `
 
-export const ModalApplyButton = styled.TouchableOpacity`
+export const ModalApplyButton = styled.TouchableOpacity<{ disabled?: boolean }>`
     flex: 1;
     height: ${RFValue(50)}px;
-    background-color: ${({ theme }) =>
-        theme.colors.primary};
+    background-color: ${({ disabled, theme }) =>
+        disabled ? theme.base.shape_third : theme.colors.primary};
     border-radius: 8px;
     align-items: center;
     justify-content: center;
 `
 
-export const ModalApplyButtonText = styled.Text`
+export const ModalApplyButtonText = styled.Text<{ disabled?: boolean }>`
     font-family: ${({ theme }) => theme.fonts.medium};
     font-size: ${RFValue(14)}px;
-    color: ${({ theme }) => theme.base.white};
+    color: ${({ disabled, theme }) => disabled ? theme.colors.text : theme.base.white};
 `
 
 export const ModalButtonText = styled.Text`

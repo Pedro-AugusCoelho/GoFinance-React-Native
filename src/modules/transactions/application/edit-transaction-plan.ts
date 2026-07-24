@@ -11,7 +11,7 @@ interface EditTransactionPlanInput {
     id: string
     scope: EditTransactionScope
     name: string
-    value: number
+    valueCents: number
     type: 'income' | 'outcome'
     category: string
     date: Date
@@ -58,7 +58,7 @@ export async function editTransactionPlan(
         return {
             ...transaction,
             name: input.name,
-            value: input.value,
+            value: input.valueCents,
             type: input.type,
             category: input.category,
             date: serializeTransactionDate(nextDate),

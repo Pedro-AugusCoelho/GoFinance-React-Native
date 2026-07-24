@@ -5,7 +5,7 @@ import { AppError } from '../../../core/errors/app-error'
 
 interface CreateInstallmentPlanParams {
     name: string
-    totalValue: number
+    totalValueCents: number
     installments: number
     type: 'income' | 'outcome'
     category: string
@@ -15,14 +15,14 @@ interface CreateInstallmentPlanParams {
 
 export function createInstallmentPlan({
     name,
-    totalValue,
+    totalValueCents,
     installments,
     type,
     category,
     date,
     createId,
 }: CreateInstallmentPlanParams): TransactionDTO[] {
-    if (!Number.isFinite(totalValue) || totalValue <= 0) {
+    if (!Number.isInteger(totalValueCents) || totalValueCents <= 0) {
         throw new AppError('INVALID_TRANSACTION_VALUE', 'O valor da transação é inválido.')
     }
 
@@ -30,9 +30,8 @@ export function createInstallmentPlan({
         throw new AppError('INVALID_INSTALLMENT_COUNT', 'A quantidade de parcelas é inválida.')
     }
 
-    const totalCents = Math.round(totalValue * 100)
-    const baseInstallmentCents = Math.floor(totalCents / installments)
-    const remainingCents = totalCents - baseInstallmentCents * installments
+    const baseInstallmentCents = Math.floor(totalValueCents / installments)
+    const remainingCents = totalValueCents - baseInstallmentCents * installments
     const planId = createId()
 
     return Array.from({ length: installments }, (_, index) => ({
@@ -40,7 +39,7 @@ export function createInstallmentPlan({
         name: installments > 1
             ? `${name} - ${String(index + 1).padStart(2, '0')}/${installments}`
             : name,
-        value: (baseInstallmentCents + (index < remainingCents ? 1 : 0)) / 100,
+        value: baseInstallmentCents + (index < remainingCents ? 1 : 0),
         amount: installments,
         type,
         category,

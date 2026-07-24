@@ -5,7 +5,7 @@ import { TransactionDTO } from '../storage/transaction.dto'
 
 interface CreateTransactionPlanInput {
     name: string
-    totalValue: number
+    totalValueCents: number
     installments: number
     type: 'income' | 'outcome'
     category: string

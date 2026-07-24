@@ -35,6 +35,92 @@ export const ChartContainer = styled.View`
     align-items: center;
 `;
 
+export const SectionTitle = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.medium};
+    font-size: ${RFValue(16)}px;
+    color: ${({ theme }) => theme.colors.title};
+`;
+
+export const SectionHeader = styled.View`
+    width: 100%;
+    margin: ${RFValue(18)}px 0 ${RFValue(10)}px;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+`;
+
+export const SectionTotal = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.bold};
+    font-size: ${RFValue(15)}px;
+    color: ${({ theme }) => theme.colors.title};
+`;
+
+export const CategoryRow = styled.View`
+    width: 100%;
+    margin-bottom: ${RFValue(15)}px;
+`;
+
+export const CategoryHeader = styled.View`
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+`;
+
+export const CategoryInfo = styled.View`
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+`;
+
+export const CategoryIcon = styled(Feather)`
+    margin-right: ${RFValue(8)}px;
+    font-size: ${RFValue(18)}px;
+    color: ${({ theme }) => theme.colors.text};
+`;
+
+export const CategoryName = styled.Text`
+    flex-shrink: 1;
+    font-family: ${({ theme }) => theme.fonts.regular};
+    font-size: ${RFValue(14)}px;
+    color: ${({ theme }) => theme.colors.title};
+`;
+
+export const CategoryAmount = styled.Text`
+    margin-left: ${RFValue(8)}px;
+    font-family: ${({ theme }) => theme.fonts.medium};
+    font-size: ${RFValue(14)}px;
+    color: ${({ theme }) => theme.colors.title};
+`;
+
+export const CategoryPercent = styled.Text`
+    margin-top: ${RFValue(3)}px;
+    font-family: ${({ theme }) => theme.fonts.regular};
+    font-size: ${RFValue(12)}px;
+    color: ${({ theme }) => theme.colors.text};
+`;
+
+export const ProgressTrack = styled.View`
+    width: 100%;
+    height: ${RFValue(7)}px;
+    margin-top: ${RFValue(7)}px;
+    overflow: hidden;
+    border-radius: ${RFValue(4)}px;
+    background-color: ${({ theme }) => theme.base.shape_third};
+`;
+
+interface ProgressFillProps {
+    color: string;
+    widthPercent: number;
+}
+
+export const ProgressFill = styled.View<ProgressFillProps>`
+    width: ${({ widthPercent }) => `${Math.max(0, Math.min(100, widthPercent))}%`};
+    height: 100%;
+    border-radius: ${RFValue(4)}px;
+    background-color: ${({ color }) => color};
+`;
+
 export const EmptyContainer = styled.View`
     width: 100%;
     min-height: ${RFValue(220)}px;

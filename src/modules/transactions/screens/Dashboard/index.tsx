@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import {
+    Animated,
     ListRenderItemInfo,
     Platform,
     TouchableOpacity,
@@ -47,6 +48,34 @@ interface TransactionListItem {
     status?: 'pending' | 'paid'
 }
 
+function AnimatedTransactionCard({ children, index }: { children: React.ReactNode; index: number }) {
+    const opacity = React.useRef(new Animated.Value(0)).current
+    const translateY = React.useRef(new Animated.Value(12)).current
+
+    React.useEffect(() => {
+        Animated.parallel([
+            Animated.timing(opacity, {
+                toValue: 1,
+                duration: 320,
+                delay: Math.min(index * 45, 300),
+                useNativeDriver: true,
+            }),
+            Animated.timing(translateY, {
+                toValue: 0,
+                duration: 320,
+                delay: Math.min(index * 45, 300),
+                useNativeDriver: true,
+            }),
+        ]).start()
+    }, [index, opacity, translateY])
+
+    return (
+        <Animated.View style={{ opacity, transform: [{ translateY }] }}>
+            {children}
+        </Animated.View>
+    )
+}
+
 export function Dashboard() {
     const navigation: AppStackNavigationProp = useNavigation()
     const theme = useTheme()
@@ -77,12 +106,29 @@ export function Dashboard() {
     const [periodDirection, setPeriodDirection] = useState<
         'forward' | 'backward'
     >('forward')
+    const [selectedQuickPeriod, setSelectedQuickPeriod] = useState<number | null>(null)
 
     const [isLoading, setIsLoading] = useState(true)
 
     const [allTransactions, setAllTransactions] = useState<TransactionDTO[]>([])
 
     const [data, setData] = useState<TransactionListItem[]>([])
+    const dateRangeOpacity = useRef(new Animated.Value(1)).current
+
+    useEffect(() => {
+        Animated.sequence([
+            Animated.timing(dateRangeOpacity, {
+                toValue: 0.35,
+                duration: 100,
+                useNativeDriver: true,
+            }),
+            Animated.timing(dateRangeOpacity, {
+                toValue: 1,
+                duration: 220,
+                useNativeDriver: true,
+            }),
+        ]).start()
+    }, [startDate, endDate, dateRangeOpacity])
 
     const [highlightData, setHighlightData] = useState<HighlightData>({
         entries: {
@@ -110,6 +156,7 @@ export function Dashboard() {
 
         if (selectedDate) {
             setTempStartDate(selectedDate)
+            setSelectedQuickPeriod(null)
         }
     }
 
@@ -118,6 +165,7 @@ export function Dashboard() {
 
         if (selectedDate) {
             setTempEndDate(selectedDate)
+            setSelectedQuickPeriod(null)
         }
     }
 
@@ -134,6 +182,10 @@ export function Dashboard() {
     }
 
     function handleApplyDates() {
+        if (tempEndDate.getTime() < tempStartDate.getTime()) {
+            return
+        }
+
         setStartDate(tempStartDate)
         setEndDate(tempEndDate)
         handleCloseDateModal()
@@ -150,10 +202,12 @@ export function Dashboard() {
 
         setTempStartDate(firstDayOfMonth)
         setTempEndDate(today)
+        setSelectedQuickPeriod(null)
     }
 
     function handleQuickPeriod(months: number) {
         const today = new Date()
+        setSelectedQuickPeriod(months)
 
         if (periodDirection === 'forward') {
             const start = new Date(
@@ -242,7 +296,7 @@ export function Dashboard() {
                     expensiveTotal += numericValue
                 }
 
-                const value = numericValue.toLocaleString('pt-BR', {
+                const value = (numericValue / 100).toLocaleString('pt-BR', {
                     style: 'currency',
                     currency: 'BRL',
                 })
@@ -322,7 +376,7 @@ export function Dashboard() {
 
         setHighlightData({
             entries: {
-                total: Number(entriesTotal).toLocaleString('pt-BR', {
+                total: (entriesTotal / 100).toLocaleString('pt-BR', {
                     style: 'currency',
                     currency: 'BRL',
                 }),
@@ -334,7 +388,7 @@ export function Dashboard() {
                         )}`,
             },
             expensive: {
-                total: Number(expensiveTotal).toLocaleString('pt-BR', {
+                total: (expensiveTotal / 100).toLocaleString('pt-BR', {
                     style: 'currency',
                     currency: 'BRL',
                 }),
@@ -346,9 +400,9 @@ export function Dashboard() {
                         )}`,
             },
             balance: {
-                total: Number(
+                total: (Number(
                     entriesTotal - expensiveTotal,
-                ).toLocaleString('pt-BR', {
+                ) / 100).toLocaleString('pt-BR', {
                     style: 'currency',
                     currency: 'BRL',
                 }),
@@ -404,13 +458,16 @@ export function Dashboard() {
                 }
                 renderItem={({
                     item,
+                    index,
                 }: ListRenderItemInfo<TransactionListItem>) => (
-                    <S.TransactionItemWrapper>
-                        <TransactionCard
-                            data={item}
-                            onPress={handleEditCard}
-                        />
-                    </S.TransactionItemWrapper>
+                    <AnimatedTransactionCard index={index}>
+                        <S.TransactionItemWrapper>
+                            <TransactionCard
+                                data={item}
+                                onPress={handleEditCard}
+                            />
+                        </S.TransactionItemWrapper>
+                    </AnimatedTransactionCard>
                 )}
                 ListHeaderComponent={
                     <S.ListHeader>
@@ -497,15 +554,17 @@ export function Dashboard() {
                                 <S.DateRangeButtonContent>
                                     <S.DateIcon name="calendar" />
 
-                                    <S.DateRangeButtonText>
-                                        {startDate.toLocaleDateString(
-                                            'pt-BR',
-                                        )}{' '}
-                                        -{' '}
-                                        {endDate.toLocaleDateString(
-                                            'pt-BR',
-                                        )}
-                                    </S.DateRangeButtonText>
+                                    <Animated.View style={{ opacity: dateRangeOpacity }}>
+                                        <S.DateRangeButtonText>
+                                            {startDate.toLocaleDateString(
+                                                'pt-BR',
+                                            )}{' '}
+                                            -{' '}
+                                            {endDate.toLocaleDateString(
+                                                'pt-BR',
+                                            )}
+                                        </S.DateRangeButtonText>
+                                    </Animated.View>
                                 </S.DateRangeButtonContent>
 
                                 <S.DateIcon name="chevron-down" />
@@ -537,7 +596,7 @@ export function Dashboard() {
                         <S.ModalContent>
                             <S.DirectionToggle>
                                 <S.DirectionLabel>
-                                    Direção:
+                                    Período relativo:
                                 </S.DirectionLabel>
 
                                 <S.DirectionButtons>
@@ -546,11 +605,10 @@ export function Dashboard() {
                                             periodDirection ===
                                             'backward'
                                         }
-                                        onPress={() =>
-                                            setPeriodDirection(
-                                                'backward',
-                                            )
-                                        }
+                                        onPress={() => {
+                                            setPeriodDirection('backward')
+                                            setSelectedQuickPeriod(null)
+                                        }}
                                     >
                                         <S.DirectionButtonIcon
                                             name="arrow-left"
@@ -575,11 +633,10 @@ export function Dashboard() {
                                             periodDirection ===
                                             'forward'
                                         }
-                                        onPress={() =>
-                                            setPeriodDirection(
-                                                'forward',
-                                            )
-                                        }
+                                        onPress={() => {
+                                            setPeriodDirection('forward')
+                                            setSelectedQuickPeriod(null)
+                                        }}
                                     >
                                         <S.DirectionButtonIcon
                                             name="arrow-right"
@@ -606,41 +663,45 @@ export function Dashboard() {
 
                                 <S.QuickPeriodButtons>
                                     <S.QuickPeriodButton
+                                        active={selectedQuickPeriod === 3}
                                         onPress={() =>
                                             handleQuickPeriod(3)
                                         }
                                     >
-                                        <S.QuickPeriodText>
+                                        <S.QuickPeriodText active={selectedQuickPeriod === 3}>
                                             3 meses
                                         </S.QuickPeriodText>
                                     </S.QuickPeriodButton>
 
                                     <S.QuickPeriodButton
+                                        active={selectedQuickPeriod === 6}
                                         onPress={() =>
                                             handleQuickPeriod(6)
                                         }
                                     >
-                                        <S.QuickPeriodText>
+                                        <S.QuickPeriodText active={selectedQuickPeriod === 6}>
                                             6 meses
                                         </S.QuickPeriodText>
                                     </S.QuickPeriodButton>
 
                                     <S.QuickPeriodButton
+                                        active={selectedQuickPeriod === 9}
                                         onPress={() =>
                                             handleQuickPeriod(9)
                                         }
                                     >
-                                        <S.QuickPeriodText>
+                                        <S.QuickPeriodText active={selectedQuickPeriod === 9}>
                                             9 meses
                                         </S.QuickPeriodText>
                                     </S.QuickPeriodButton>
 
                                     <S.QuickPeriodButton
+                                        active={selectedQuickPeriod === 12}
                                         onPress={() =>
                                             handleQuickPeriod(12)
                                         }
                                     >
-                                        <S.QuickPeriodText>
+                                        <S.QuickPeriodText active={selectedQuickPeriod === 12}>
                                             1 ano
                                         </S.QuickPeriodText>
                                     </S.QuickPeriodButton>
@@ -751,9 +812,12 @@ export function Dashboard() {
                                 </S.ModalResetButton>
 
                                 <S.ModalApplyButton
+                                    disabled={tempEndDate.getTime() < tempStartDate.getTime()}
                                     onPress={handleApplyDates}
                                 >
-                                    <S.ModalApplyButtonText>
+                                    <S.ModalApplyButtonText
+                                        disabled={tempEndDate.getTime() < tempStartDate.getTime()}
+                                    >
                                         Aplicar
                                     </S.ModalApplyButtonText>
                                 </S.ModalApplyButton>

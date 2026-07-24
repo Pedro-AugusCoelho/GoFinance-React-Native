@@ -1,5 +1,6 @@
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 import { RFValue } from "react-native-responsive-fontsize";
+import { Animated } from "react-native";
 import styled from "styled-components/native";
 import { Feather } from '@expo/vector-icons';
 
@@ -197,4 +198,32 @@ export const TitleBtnSecondary = styled.Text`
     font-family: ${({ theme }) => theme.fonts.medium};
     font-size: ${RFValue(14)}px;
     color: ${(props) => props.theme.colors.primary}; 
+`;
+
+export const AnimatedImage = styled(Animated.Image)`
+    width: 100%;
+    height: 100%;
+    border-radius: ${RFValue(99)}px;
+`;
+
+export const ThemeSwitch = styled.TouchableOpacity`
+    width: 100%;
+    height: 100%;
+    padding: ${RFValue(3)}px;
+    border-radius: ${RFValue(15)}px;
+    justify-content: center;
+`;
+
+export const ThemeSwitchTrack = styled(Animated.View)`
+    width: ${RFValue(42)}px;
+    height: ${RFValue(24)}px;
+    border-radius: ${RFValue(12)}px;
+    justify-content: center;
+`;
+
+export const ThemeSwitchThumb = styled(Animated.View)`
+    width: ${RFValue(18)}px;
+    height: ${RFValue(18)}px;
+    border-radius: ${RFValue(9)}px;
+    background-color: ${({ theme }) => theme.colors.shape};
 `;

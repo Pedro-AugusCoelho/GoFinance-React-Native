@@ -1,10 +1,40 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useTheme } from "styled-components";
-import { Alert, Platform, ToastAndroid, TouchableOpacity } from "react-native";
+import { Alert, Animated, Platform, ToastAndroid, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const {Navigator, Screen} = createBottomTabNavigator<RootTabParamList>();
+const AnimatedMaterialIcons = Animated.createAnimatedComponent(MaterialIcons)
+
+interface TabIconProps {
+    name: React.ComponentProps<typeof MaterialIcons>['name']
+    size: number
+    color: string
+    focused: boolean
+}
+
+function TabIcon({ name, size, color, focused }: TabIconProps) {
+    const scale = useRef(new Animated.Value(focused ? 1.12 : 1)).current
+
+    useEffect(() => {
+        Animated.spring(scale, {
+            toValue: focused ? 1.12 : 1,
+            useNativeDriver: true,
+            speed: 18,
+            bounciness: 8,
+        }).start()
+    }, [focused, scale])
+
+    return (
+        <AnimatedMaterialIcons
+            name={name}
+            size={size}
+            color={color}
+            style={{ transform: [{ scale }] }}
+        />
+    )
+}
 
 import { Dashboard } from "../../modules/transactions/screens/Dashboard";
 import { Register } from "../../modules/transactions/screens/Register";
@@ -59,11 +89,12 @@ export function BottomTabsRoutes () {
                 component={Dashboard}
                 options={{
                     tabBarButton: createTabButton('Listagem'),
-                    tabBarIcon: (({ size, color }) => 
-                        <MaterialIcons
+                    tabBarIcon: (({ size, color, focused }) =>
+                        <TabIcon
                             name="format-list-bulleted"
                             size={size}
                             color={color}
+                            focused={focused}
                         />
                     )
                 }}
@@ -74,11 +105,12 @@ export function BottomTabsRoutes () {
                 component={Register}
                 options={{
                     tabBarButton: createTabButton('Cadastrar'),
-                    tabBarIcon: (({ size, color }) => 
-                        <MaterialIcons
+                    tabBarIcon: (({ size, color, focused }) =>
+                        <TabIcon
                             name="attach-money"
                             size={size}
                             color={color}
+                            focused={focused}
                         />
                     )
                 }}
@@ -89,11 +121,12 @@ export function BottomTabsRoutes () {
                 component={Resume}
                 options={{
                     tabBarButton: createTabButton('Resumo'),
-                    tabBarIcon: (({ size, color }) => 
-                    <MaterialIcons
+                    tabBarIcon: (({ size, color, focused }) =>
+                    <TabIcon
                         name="pie-chart"
                         size={size}
                         color={color}
+                        focused={focused}
                     />
                     )
                 }}
@@ -104,11 +137,12 @@ export function BottomTabsRoutes () {
                 component={Profile}
                 options={{
                     tabBarButton: createTabButton('Perfil'),
-                    tabBarIcon: (({ size, color }) => 
-                    <MaterialIcons
+                    tabBarIcon: (({ size, color, focused }) =>
+                    <TabIcon
                         name="person"
                         size={size}
                         color={color}
+                        focused={focused}
                     />
                     )
                 }}

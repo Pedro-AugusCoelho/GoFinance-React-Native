@@ -1,17 +1,16 @@
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import uuid from 'react-native-uuid'
 import { RootTabParamList } from "../../../../app/navigation/app.routes"
 import * as Yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Control, Controller, FieldValues, SubmitHandler, useForm } from "react-hook-form"
-import { Modal, Keyboard, Alert, Platform, TouchableOpacity, FlatList, KeyboardAvoidingView } from "react-native"
+import { ActivityIndicator, Animated, Modal, Keyboard, Alert, Platform, TouchableOpacity, FlatList, KeyboardAvoidingView } from "react-native"
 import { useNavigation } from '@react-navigation/native'
 import { CurrencyInput } from "../../../../shared/components/CurrencyInput"
 
 import * as R from './styles'
 import { categories } from "../../domain/categories"
 import { createTransactionPlan } from '../../application/create-transaction-plan'
-import { parseTransactionValue, roundCurrency } from '../../domain/transaction-money'
 
 import DateTimePicker from "@react-native-community/datetimepicker"
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs"
@@ -19,7 +18,7 @@ import { getErrorMessage } from '../../../../core/errors/app-error'
 
 interface FormData {
     name: string
-    value: string
+    value: number
     amount: string
     date: Date
 }
@@ -33,13 +32,15 @@ interface CategoryData {
 type TabNavigationProps = BottomTabNavigationProp<RootTabParamList>
 
 const schema = Yup.object().shape({
-    name: Yup.string().required('Nome é obrigatório'),
+    name: Yup.string().trim().required('Nome é obrigatório'),
     value: Yup.number()
         .typeError('Informe um valor numérico')
+        .integer('Informe um valor válido')
         .positive('Informe somente valores positivos')
         .required('Preço é obrigatório'),
     amount: Yup.number()
         .typeError('Informe a quantidade de parcelas')
+        .integer('Informe um número inteiro de parcelas')
         .positive('Informe somente valores positivos')
         .required('Quantidade de parcelas é obrigatória'),
 })
@@ -62,6 +63,9 @@ export function Register() {
     const formControl = control as unknown as Control<FieldValues, any>
 
     const [transactionType, setTransactionType] = useState<'income' | 'outcome' | ''>('')
+    const [isSaving, setIsSaving] = useState(false)
+    const incomeButtonScale = useRef(new Animated.Value(1)).current
+    const outcomeButtonScale = useRef(new Animated.Value(1)).current
     const [modalCategory, setModalCategory] = useState(false)
     const [category, setCategory] = useState({
         key: 'category',
@@ -70,6 +74,15 @@ export function Register() {
 
     const [showDatePicker, setShowDatePicker] = useState(false)
     const [date, setDate] = useState(new Date())
+
+    function animateTypeButton(scale: Animated.Value, toValue: number) {
+        Animated.spring(scale, {
+            toValue,
+            useNativeDriver: true,
+            speed: 24,
+            bounciness: 6,
+        }).start()
+    }
 
     function handleOpenCategoryModal() {
         setModalCategory(true)
@@ -103,11 +116,9 @@ export function Register() {
             return;
         }
     
-        const parsedTotalValue = parseTransactionValue(form.value)
-        const totalValue = parsedTotalValue === null ? null : roundCurrency(parsedTotalValue)
         const installments = Number(form.amount);
 
-        if (totalValue === null) {
+        if (!Number.isInteger(form.value) || form.value <= 0) {
             Alert.alert('Valor inválido', 'Informe um valor válido.')
             return
         }
@@ -117,10 +128,11 @@ export function Register() {
             return;
         }
     
+        setIsSaving(true)
         try {
             await createTransactionPlan({
                 name: form.name,
-                totalValue,
+                totalValueCents: form.value,
                 installments,
                 type: transactionType,
                 category: category.key,
@@ -139,6 +151,8 @@ export function Register() {
             navigation.navigate('Listagem');
         } catch (error: unknown) {
             Alert.alert('Erro', getErrorMessage(error, 'Não foi possível salvar a transação.'))
+        } finally {
+            setIsSaving(false)
         }
     }
     
@@ -232,27 +246,59 @@ export function Register() {
                         {/* @ts-ignore */}
                         <R.BoxBtn>
                             {/* @ts-ignore */}
-                            <R.BtnSelected onPress={() => setTransactionType('income')} isActive={transactionType === 'income'} type={transactionType}>
-                                <R.Icon name='arrow-up-circle' type='income' />
-                                <R.TextBtn>Entrada</R.TextBtn>
-                            </R.BtnSelected>
+                            <Animated.View style={{ flex: 1, transform: [{ scale: incomeButtonScale }] }}>
+                                <R.BtnSelected
+                                    onPress={() => setTransactionType('income')}
+                                    onPressIn={() => animateTypeButton(incomeButtonScale, 0.96)}
+                                    onPressOut={() => animateTypeButton(incomeButtonScale, 1)}
+                                    isActive={transactionType === 'income'}
+                                    type={transactionType}
+                                >
+                                    <R.Icon name='arrow-up-circle' type='income' />
+                                    <R.TextBtn>Entrada</R.TextBtn>
+                                </R.BtnSelected>
+                            </Animated.View>
 
                             {/* @ts-ignore */}
-                            <R.BtnSelected onPress={() => setTransactionType('outcome')} isActive={transactionType === 'outcome'} type={transactionType}>
-                                <R.Icon name='arrow-down-circle' type='outcome' />
-                                <R.TextBtn>Saída</R.TextBtn>
-                            </R.BtnSelected>
+                            <Animated.View style={{ flex: 1, transform: [{ scale: outcomeButtonScale }] }}>
+                                <R.BtnSelected
+                                    onPress={() => setTransactionType('outcome')}
+                                    onPressIn={() => animateTypeButton(outcomeButtonScale, 0.96)}
+                                    onPressOut={() => animateTypeButton(outcomeButtonScale, 1)}
+                                    isActive={transactionType === 'outcome'}
+                                    type={transactionType}
+                                >
+                                    <R.Icon name='arrow-down-circle' type='outcome' />
+                                    <R.TextBtn>Saída</R.TextBtn>
+                                </R.BtnSelected>
+                            </Animated.View>
                         </R.BoxBtn>
 
-                        <R.Category onPress={handleOpenCategoryModal}>
-                            <R.CategoryTitle>{category.name}</R.CategoryTitle>
+                            <R.Category onPress={handleOpenCategoryModal}>
+                            <R.CategoryInfo>
+                                {category.key !== 'category' && (
+                                    <R.CategorySelectedIcon
+                                        name={categories.find(item => item.key === category.key)?.icon as React.ComponentProps<typeof R.CategorySelectedIcon>['name']}
+                                    />
+                                )}
+                                <R.CategoryTitle>{category.name}</R.CategoryTitle>
+                            </R.CategoryInfo>
                             <R.CategoryIcon name='chevron-down' />
                         </R.Category>
                     </R.InputContainer>
 
-                    <R.BtnSubmit onPress={handleSubmit(handleRegister as unknown as SubmitHandler<FieldValues>)}>
-                        <R.IconSubmit name='save' />
-                        <R.TextSubmit>Salvar</R.TextSubmit>
+                    <R.BtnSubmit
+                        onPress={handleSubmit(handleRegister as unknown as SubmitHandler<FieldValues>)}
+                        disabled={isSaving}
+                    >
+                        {isSaving ? (
+                            <ActivityIndicator color="#FFFFFF" />
+                        ) : (
+                            <>
+                                <R.IconSubmit name='save' />
+                                <R.TextSubmit>Salvar</R.TextSubmit>
+                            </>
+                        )}
                     </R.BtnSubmit>
                 </R.Body>
 
