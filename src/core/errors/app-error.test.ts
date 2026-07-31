@@ -12,7 +12,7 @@ describe('application errors', () => {
 
     it('maps technical errors to safe user-facing messages', () => {
         expect(getErrorMessage(new AppError('BACKUP_INVALID', 'invalid')))
-            .toContain('backup GoFinance válido')
+            .toContain('backup Plutora válido')
         expect(getErrorMessage(new Error('internal detail')))
             .toBe('Não foi possível concluir a operação.')
     })

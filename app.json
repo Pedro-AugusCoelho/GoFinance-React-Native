@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "gofinance",
-    "slug": "gofinance",
+    "name": "Plutora",
+    "slug": "plutora",
     "icon": "./src/assets/icon.png",
-    "scheme": "gofinance",
+    "scheme": "plutora",
     "version": "1.3.0",
     "assetBundlePatterns": [
       "**/*"
@@ -11,7 +11,7 @@
     "splash": {
       "image": "./src/assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#323238"
+      "backgroundColor": "#00875F"
     },
     "extra": {
       "eas": {
@@ -20,7 +20,7 @@
     },
     "android": {
       "package": "com.pedro_augus_coelho_costa.gofinance",
-      "versionCode": 1
+      "versionCode": 2
     },
     "ios": {
       "bundleIdentifier": "com.pedro_augus_coelho_costa.gofinance",

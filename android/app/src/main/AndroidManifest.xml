@@ -25,7 +25,7 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="gofinance"/>
+        <data android:scheme="plutora"/>
         <data android:scheme="com.pedro_augus_coelho_costa.gofinance"/>
       </intent-filter>
     </activity>

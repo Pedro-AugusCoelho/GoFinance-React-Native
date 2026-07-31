@@ -1,8 +1,8 @@
-# GoFinance
+# Plutora
 
 Aplicativo mobile offline-first para controle de finanças pessoais, desenvolvido com Expo e React Native.
 
-O GoFinance permite registrar entradas e saídas, acompanhar parcelas, visualizar resumos por categoria e manter os dados disponíveis sem conexão com a internet.
+O Plutora permite registrar entradas e saídas, acompanhar parcelas, visualizar resumos por categoria e manter os dados disponíveis sem conexão com a internet.
 
 ## Recursos
 

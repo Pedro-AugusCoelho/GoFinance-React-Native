@@ -45,7 +45,7 @@ export function getErrorMessage(error: unknown, fallback = 'Não foi possível c
 
     switch (appError.code) {
         case 'BACKUP_INVALID':
-            return 'O arquivo não é um backup GoFinance válido ou é incompatível com esta versão.'
+            return 'O arquivo não é um backup Plutora válido ou é incompatível com esta versão.'
         case 'BACKUP_FILE_READ_FAILED':
             return 'Não foi possível ler o arquivo selecionado.'
         case 'BACKUP_RESTORE_FAILED':

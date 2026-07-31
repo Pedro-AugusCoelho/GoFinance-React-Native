@@ -6,7 +6,7 @@ Aceito
 
 ## Contexto
 
-O GoFinance é um aplicativo pessoal de finanças e precisa continuar útil sem conexão de rede. Cadastro, edição, exclusão, consultas, tema, perfil e backup não podem depender de servidor.
+O Plutora é um aplicativo pessoal de finanças e precisa continuar útil sem conexão de rede. Cadastro, edição, exclusão, consultas, tema, perfil e backup não podem depender de servidor.
 
 ## Decisão
 

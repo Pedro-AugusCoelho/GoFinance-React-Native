@@ -5,7 +5,6 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const {Navigator, Screen} = createBottomTabNavigator<RootTabParamList>();
-const AnimatedMaterialIcons = Animated.createAnimatedComponent(MaterialIcons)
 
 interface TabIconProps {
     name: React.ComponentProps<typeof MaterialIcons>['name']
@@ -18,21 +17,28 @@ function TabIcon({ name, size, color, focused }: TabIconProps) {
     const scale = useRef(new Animated.Value(focused ? 1.12 : 1)).current
 
     useEffect(() => {
-        Animated.spring(scale, {
+        const animation = Animated.spring(scale, {
             toValue: focused ? 1.12 : 1,
             useNativeDriver: true,
             speed: 18,
             bounciness: 8,
-        }).start()
+        })
+
+        animation.start()
+
+        return () => {
+            animation.stop()
+        }
     }, [focused, scale])
 
     return (
-        <AnimatedMaterialIcons
-            name={name}
-            size={size}
-            color={color}
-            style={{ transform: [{ scale }] }}
-        />
+        <Animated.View style={{ transform: [{ scale }] }}>
+            <MaterialIcons
+                name={name}
+                size={size}
+                color={color}
+            />
+        </Animated.View>
     )
 }
 

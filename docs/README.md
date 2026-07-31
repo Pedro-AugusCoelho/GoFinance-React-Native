@@ -1,10 +1,10 @@
-# Documentação do GoFinance
+# Documentação do Plutora
 
 Esta pasta documenta o estado atual do aplicativo mobile, suas decisões arquiteturais e as pendências reais. O produto é offline-first.
 
 ## Resumo
 
-O GoFinance é um aplicativo Expo/React Native offline-first para controle pessoal de finanças. Permite criar um usuário local, registrar entradas e saídas, consultar lançamentos por período, visualizar um resumo por categoria, editar o perfil, alternar tema e exportar/importar backup JSON. Os dados ficam localmente em SQLite; não há backend ou sincronização remota, e nenhuma operação essencial deve depender de rede.
+O Plutora é um aplicativo Expo/React Native offline-first para controle pessoal de finanças. Permite criar um usuário local, registrar entradas e saídas, consultar lançamentos por período, visualizar um resumo por categoria, editar o perfil, alternar tema e exportar/importar backup JSON. Os dados ficam localmente em SQLite; não há backend ou sincronização remota, e nenhuma operação essencial deve depender de rede.
 
 ## Documentos
 
