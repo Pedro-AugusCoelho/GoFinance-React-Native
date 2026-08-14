@@ -20,7 +20,11 @@
     },
     "android": {
       "package": "com.pedro_augus_coelho_costa.gofinance",
-      "versionCode": 2
+      "versionCode": 3,
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "backgroundColor": "#00875F"
+      }
     },
     "ios": {
       "bundleIdentifier": "com.pedro_augus_coelho_costa.gofinance",
