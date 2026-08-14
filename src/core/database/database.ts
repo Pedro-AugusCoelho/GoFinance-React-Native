@@ -10,7 +10,7 @@ import { UserDTO } from '../../modules/user/storage/user.dto'
 import { toAppError } from '../errors/app-error'
 
 const DATABASE_NAME = 'gofinance.db'
-const SCHEMA_VERSION = 1
+const SCHEMA_VERSION = 2
 
 let databasePromise: Promise<SQLiteDatabase> | null = null
 
@@ -35,7 +35,7 @@ async function migrateLegacyStorage(database: SQLiteDatabase) {
         ['schema_version'],
     )
 
-    if (schema?.value === String(SCHEMA_VERSION)) {
+    if (schema?.value) {
         return
     }
 
@@ -66,8 +66,8 @@ async function migrateLegacyStorage(database: SQLiteDatabase) {
                 await transaction.runAsync(
                     `INSERT OR REPLACE INTO transactions
                     (id, type, name, value, amount, category, date, plan_id,
-                     installment_number, installment_total, status)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                     installment_number, installment_total, status, import_source, external_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                     [
                         item.id,
                         item.type,
@@ -80,6 +80,8 @@ async function migrateLegacyStorage(database: SQLiteDatabase) {
                         item.installmentNumber ?? null,
                         item.installmentTotal ?? null,
                         item.status ?? 'pending',
+                        item.importSource ?? null,
+                        item.externalId ?? null,
                     ],
                 )
             }
@@ -134,14 +136,43 @@ async function initializeDatabase(): Promise<SQLiteDatabase> {
             plan_id TEXT,
             installment_number INTEGER,
             installment_total INTEGER,
-            status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'paid'))
+            status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'paid')),
+            import_source TEXT,
+            external_id TEXT
         );
         CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date);
         CREATE INDEX IF NOT EXISTS idx_transactions_plan_id ON transactions(plan_id);
     `)
 
     await migrateLegacyStorage(database)
+    await migrateNativeSchema(database)
     return database
+}
+
+async function migrateNativeSchema(database: SQLiteDatabase) {
+    const columns = await database.getAllAsync<{ name: string }>(
+        'PRAGMA table_info(transactions)',
+    )
+    const columnNames = new Set(columns.map((column) => column.name))
+
+    if (!columnNames.has('import_source')) {
+        await database.execAsync('ALTER TABLE transactions ADD COLUMN import_source TEXT')
+    }
+
+    if (!columnNames.has('external_id')) {
+        await database.execAsync('ALTER TABLE transactions ADD COLUMN external_id TEXT')
+    }
+
+    await database.execAsync(`
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_transactions_import_identity
+        ON transactions(import_source, external_id)
+        WHERE import_source IS NOT NULL AND external_id IS NOT NULL
+    `)
+
+    await database.runAsync(
+        'INSERT OR REPLACE INTO metadata (key, value) VALUES (?, ?)',
+        ['schema_version', String(SCHEMA_VERSION)],
+    )
 }
 
 export function getDatabase(): Promise<SQLiteDatabase> {

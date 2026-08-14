@@ -13,7 +13,7 @@ export const Header = styled.View`
 
 export const TitleWrapper = styled.View`
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     flex-direction: column;
     margin: 34px 38px;
 `;
@@ -26,18 +26,12 @@ export const Title = styled.Text`
     color: ${({ theme }) => theme.base.white};
 `;
 
-export const ContainerAccessInfo = styled.View`
-    margin: 0px 85px;
-    margin-bottom: 60px;
-    justify-content: center;
-    align-items: center;
-`;
-
 export const AccessInfo = styled.Text`
+    margin-top: ${RFValue(4)}px;
     text-align: center;
     font-family: ${({ theme }) => theme.fonts.regular};
     font-size: ${RFValue(16)}px;
-    color: ${({ theme }) => theme.base.white}; 
+    color: ${({ theme }) => theme.base.white};
 `;
 
 export const Footer = styled.View`

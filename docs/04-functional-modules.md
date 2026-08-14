@@ -19,3 +19,7 @@
 ## Backup e restauração
 
 `modules/backup` gera JSON com `format`, `version`, `exportedAt`, `checksum` e `data`. A restauração valida o envelope e substitui usuário, tema e transações dentro de uma transação SQLite.
+
+## Importação de extratos
+
+`modules/statement-import` lê CSV do Nubank e do PicPay, importa somente saídas e persiste `importSource` + `externalId` para evitar duplicatas. A aba `Importar` lista os bancos e confirma a prévia antes de gravar.

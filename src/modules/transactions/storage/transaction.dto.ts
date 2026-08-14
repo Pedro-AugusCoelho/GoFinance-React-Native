@@ -1,3 +1,5 @@
+export type TransactionImportSource = 'nubank' | 'picpay'
+
 export interface TransactionDTO {
     id: string;
     type: 'income' | 'outcome';
@@ -10,4 +12,6 @@ export interface TransactionDTO {
     installmentNumber?: number;
     installmentTotal?: number;
     status?: 'pending' | 'paid';
+    importSource?: TransactionImportSource;
+    externalId?: string;
 }

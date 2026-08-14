@@ -42,7 +42,9 @@ function isTransaction(value: unknown): value is TransactionDTO {
         (transaction.planId === undefined || typeof transaction.planId === 'string') &&
         isOptionalPositiveInteger(transaction.installmentNumber) &&
         isOptionalPositiveInteger(transaction.installmentTotal) &&
-        (transaction.status === undefined || transaction.status === 'pending' || transaction.status === 'paid')
+        (transaction.status === undefined || transaction.status === 'pending' || transaction.status === 'paid') &&
+        (transaction.importSource === undefined || transaction.importSource === 'nubank' || transaction.importSource === 'picpay') &&
+        (transaction.externalId === undefined || typeof transaction.externalId === 'string')
 }
 
 function isOptionalPositiveInteger(value: unknown): boolean {

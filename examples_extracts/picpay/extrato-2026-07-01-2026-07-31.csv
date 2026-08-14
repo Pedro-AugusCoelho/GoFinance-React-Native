@@ -1,0 +1,16 @@
+﻿data,hora,tipo,"origem / destino",valor,"forma de pagamento"
+2026-07-29,17:10,"Pix recebido","TATIANA DA SILVA SANTOS","+R$ 43,50",
+2026-07-25,15:57,"Compra realizada","212 Shibata Sao Jose dos Bra","−R$ 36,96","Com saldo"
+2026-07-24,18:25,"Pix recebido","TATIANA DA SILVA SANTOS","+R$ 26,00",
+2026-07-21,07:13,"Pix enviado","Luana Galvão Ribeiro Silva","−R$ 87,00","Com saldo"
+2026-07-15,16:28,"Dinheiro resgatado","Do cofrinho Cashback","+R$ 11,85",
+2026-07-12,16:59,"Pix recebido","TATIANA DA SILVA SANTOS","+R$ 145,89",
+2026-07-08,14:26,"Pix enviado","ICARO ALBANO MONTEIRO","−R$ 25,00","Com saldo"
+2026-07-08,14:25,"Pix recebido","Pedro Augusto Coelho Costa","+R$ 25,00",
+2026-07-07,16:39,"Pagamento realizado","Fatura PicPay Card","−R$ 988,06","Com saldo"
+2026-07-07,16:38,"Pix recebido","Pedro Augusto Coelho Costa","+R$ 962,07",
+2026-07-04,10:20,"Pix recebido","TATIANA DA SILVA SANTOS","+R$ 25,99",
+2026-07-03,09:30,"Pix enviado","Pedro Augusto Coelho Costa","−R$ 2.110,24","Com saldo"
+2026-07-03,09:29,"Dinheiro resgatado","Do cofrinho Só guardar dinheiro","+R$ 2.110,24",
+2026-07-02,14:33,"Pix enviado","Pedro Augusto Coelho Costa","−R$ 4.000,00","Com saldo"
+2026-07-02,14:33,"Dinheiro resgatado","Do cofrinho Só guardar dinheiro","+R$ 4.000,00",

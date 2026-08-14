@@ -14,6 +14,10 @@ export type AppErrorCode =
     | 'USER_SAVE_FAILED'
     | 'THEME_LOAD_FAILED'
     | 'THEME_SAVE_FAILED'
+    | 'STATEMENT_FILE_READ_FAILED'
+    | 'STATEMENT_UNSUPPORTED_FORMAT'
+    | 'STATEMENT_PARSE_FAILED'
+    | 'STATEMENT_IMPORT_FAILED'
     | 'UNKNOWN'
 
 export class AppError extends Error {
@@ -70,6 +74,14 @@ export function getErrorMessage(error: unknown, fallback = 'Não foi possível c
         case 'THEME_LOAD_FAILED':
         case 'THEME_SAVE_FAILED':
             return 'Não foi possível atualizar o tema.'
+        case 'STATEMENT_FILE_READ_FAILED':
+            return 'Não foi possível ler o arquivo selecionado.'
+        case 'STATEMENT_UNSUPPORTED_FORMAT':
+            return appError.message || 'Este arquivo não é um extrato Nubank ou PicPay suportado.'
+        case 'STATEMENT_PARSE_FAILED':
+            return 'Não foi possível interpretar o extrato. Verifique o arquivo e tente novamente.'
+        case 'STATEMENT_IMPORT_FAILED':
+            return 'Não foi possível importar o extrato. Seus dados atuais foram preservados.'
         default:
             return appError.message || fallback
     }

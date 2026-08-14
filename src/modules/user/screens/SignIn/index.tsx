@@ -52,12 +52,8 @@ export function SignIn () {
                     {/* @ts-ignore */}
                     <S.TitleWrapper>
                         <S.Title>Controle suas finanças de forma muito simples</S.Title>
-                    </S.TitleWrapper>
-
-                    <S.ContainerAccessInfo>
-                        {/* @ts-ignore */}
                         <S.AccessInfo>Acesse informando seu nome</S.AccessInfo>
-                    </S.ContainerAccessInfo>
+                    </S.TitleWrapper>
                 </S.Header>
 
                 <S.Footer>

@@ -25,8 +25,8 @@ export async function restoreAppData(data: AppData) {
             await transaction.runAsync(
                 `INSERT INTO transactions
                 (id, type, name, value, amount, category, date, plan_id,
-                 installment_number, installment_total, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                 installment_number, installment_total, status, import_source, external_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     item.id,
                     item.type,
@@ -39,6 +39,8 @@ export async function restoreAppData(data: AppData) {
                     item.installmentNumber ?? null,
                     item.installmentTotal ?? null,
                     item.status ?? 'pending',
+                    item.importSource ?? null,
+                    item.externalId ?? null,
                 ],
             )
         }

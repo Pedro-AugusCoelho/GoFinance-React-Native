@@ -437,3 +437,26 @@ export const LoadMoreText = styled.Text`
     font-size: ${RFValue(13)}px;
     color: ${({ theme }) => theme.colors.primary};
 `
+
+export const EmptyContainer = styled.View`
+    width: 100%;
+    min-height: ${RFValue(180)}px;
+    justify-content: center;
+    align-items: center;
+    padding: ${RFValue(24)}px;
+`
+
+export const EmptyIcon = styled(Feather)`
+    font-size: ${RFValue(48)}px;
+    color: ${({ theme }) => theme.colors.text};
+    opacity: 0.4;
+    margin-bottom: ${RFValue(16)}px;
+`
+
+export const EmptyText = styled.Text`
+    font-family: ${({ theme }) => theme.fonts.regular};
+    font-size: ${RFValue(15)}px;
+    color: ${({ theme }) => theme.colors.text};
+    text-align: center;
+    line-height: ${RFValue(22)}px;
+`

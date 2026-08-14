@@ -424,10 +424,10 @@ export function Dashboard() {
     }
 
     const filteredTransactions = useMemo(() => filterTransactionsByPeriod(
-            allTransactions,
-            startDate,
-            endDate,
-        ), [allTransactions, startDate, endDate])
+        allTransactions,
+        startDate,
+        endDate,
+    ), [allTransactions, startDate, endDate])
 
     useEffect(() => {
         setVisibleLimit(30)
@@ -470,6 +470,15 @@ export function Dashboard() {
                 updateCellsBatchingPeriod={50}
                 windowSize={7}
                 removeClippedSubviews={Platform.OS === 'android'}
+                ListEmptyComponent={
+                    <S.EmptyContainer>
+                        <S.EmptyIcon name="inbox" />
+
+                        <S.EmptyText>
+                            Não há nenhum lançamento no período selecionado.
+                        </S.EmptyText>
+                    </S.EmptyContainer>
+                }
                 ListFooterComponent={hasMoreTransactions ? (
                     <S.LoadMoreButton onPress={handleLoadMore}>
                         <S.LoadMoreText>Carregar mais lançamentos</S.LoadMoreText>

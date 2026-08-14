@@ -24,11 +24,13 @@ O Plutora é um aplicativo Expo/React Native offline-first para controle pessoal
 14. [Convenções](14-development-conventions.md)
 15. [Estratégia de testes](15-testing-strategy.md)
 16. [Riscos e dúvidas](16-risks-and-open-questions.md)
-17. [ADRs](decisions/README.md)
+17. [Matriz de suporte de plataformas](17-platform-support-matrix.md)
+18. [Prompt: importação de extratos](18-bank-statement-import-prompt.md)
+19. [ADRs](decisions/README.md)
 
 ## Ordem recomendada
 
-Leia primeiro os documentos 01 a 10 para o estado atual; depois 11 a 15 para princípios, estrutura, roadmap, convenções e testes; por fim, 16, 17 e os ADRs.
+Leia primeiro os documentos 01 a 10 para o estado atual; depois 11 a 15 para princípios, estrutura, roadmap, convenções e testes; por fim, 16 a 18 e os ADRs.
 
 ## Pontos pendentes
 

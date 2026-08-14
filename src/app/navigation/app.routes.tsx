@@ -44,6 +44,7 @@ function TabIcon({ name, size, color, focused }: TabIconProps) {
 
 import { Dashboard } from "../../modules/transactions/screens/Dashboard";
 import { Register } from "../../modules/transactions/screens/Register";
+import { ImportStatement } from "../../modules/statement-import/screens/ImportStatement";
 import { Resume } from "../../modules/reports/screens/Resume";
 import { Profile } from "../../modules/user/screens/Profile";
 
@@ -51,6 +52,7 @@ import { Profile } from "../../modules/user/screens/Profile";
 export type RootTabParamList = {
     Listagem: undefined
     Cadastrar: undefined
+    Importar: undefined
     Resumo: undefined
     Perfil: undefined
 }
@@ -114,6 +116,22 @@ export function BottomTabsRoutes () {
                     tabBarIcon: (({ size, color, focused }) =>
                         <TabIcon
                             name="attach-money"
+                            size={size}
+                            color={color}
+                            focused={focused}
+                        />
+                    )
+                }}
+            />
+
+            <Screen
+                name="Importar"
+                component={ImportStatement}
+                options={{
+                    tabBarButton: createTabButton('Importar extrato'),
+                    tabBarIcon: (({ size, color, focused }) =>
+                        <TabIcon
+                            name="upload-file"
                             size={size}
                             color={color}
                             focused={focused}

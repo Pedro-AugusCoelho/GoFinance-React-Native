@@ -13,8 +13,8 @@ export async function saveTransactions(transactions: TransactionDTO[]) {
             await transaction.runAsync(
                 `INSERT INTO transactions
                 (id, type, name, value, amount, category, date, plan_id,
-                 installment_number, installment_total, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                 installment_number, installment_total, status, import_source, external_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     item.id,
                     item.type,
@@ -27,6 +27,8 @@ export async function saveTransactions(transactions: TransactionDTO[]) {
                     item.installmentNumber ?? null,
                     item.installmentTotal ?? null,
                     item.status ?? 'pending',
+                    item.importSource ?? null,
+                    item.externalId ?? null,
                 ],
             )
         }
