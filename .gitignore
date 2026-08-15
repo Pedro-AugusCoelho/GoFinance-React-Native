@@ -84,3 +84,7 @@ Thumbs.db
 
 # Examples extracts
 examples_extracts/
+
+# Native projects (generated via expo prebuild)
+android/
+ios/
