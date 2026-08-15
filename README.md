@@ -2,17 +2,42 @@
 
 Aplicativo mobile offline-first para controle de finanças pessoais, desenvolvido com Expo e React Native.
 
-O Plutora permite registrar entradas e saídas, acompanhar parcelas, visualizar resumos por categoria e manter os dados disponíveis sem conexão com a internet.
+O Plutora permite registrar entradas e saídas, acompanhar parcelas, importar gastos de faturas bancárias, visualizar resumos por categoria e manter os dados disponíveis sem conexão com a internet.
 
 ## Recursos
+
+### Lançamentos
 
 - Cadastro e edição de entradas e saídas.
 - Parcelamento com distribuição correta dos centavos.
 - Edição ou exclusão da parcela atual, das próximas ou de todo o plano.
-- Filtros por período.
+- Status pendente ou pago por transação.
+- Categorias expandidas (compras, alimentação, moradia, transporte, saúde, assinaturas, investimentos e outras).
+
+### Listagem e filtros
+
+- Filtros por período com data inicial e final personalizáveis.
+- Atalhos rápidos de 3, 6, 9 e 12 meses.
+- Navegação entre períodos passados e futuros.
+- Resumo do período com entradas, saídas e saldo.
+- Carregamento progressivo da lista de transações.
+
+### Importação de faturas
+
+- Importação de fatura do cartão Nubank em CSV.
+- Importa apenas gastos (saídas); estornos e créditos são ignorados.
+- Prévia com contagem de linhas, novos gastos e duplicatas antes de confirmar.
+- Deduplicação automática em reimportações via `importSource` + `externalId`.
+- Detecção automática do formato do arquivo.
+
+### Relatórios e perfil
+
 - Resumo mensal por categoria com gráfico.
 - Perfil local com nome e foto.
 - Tema claro e escuro.
+
+### Dados e backup
+
 - Banco local SQLite.
 - Migração automática de instalações legadas baseadas em AsyncStorage.
 - Backup JSON versionado, validado e protegido por checksum SHA-256.
@@ -20,7 +45,7 @@ O Plutora permite registrar entradas e saídas, acompanhar parcelas, visualizar 
 
 ## Princípio offline-first
 
-O SQLite local é a fonte de verdade do aplicativo. As operações essenciais — cadastro, edição, exclusão, consulta, perfil, tema e backup — não dependem de rede.
+O SQLite local é a fonte de verdade do aplicativo. As operações essenciais — cadastro, edição, exclusão, consulta, importação, perfil, tema e backup — não dependem de rede.
 
 Não existe backend ou sincronização remota atualmente. Caso seja adicionada no futuro, deverá ser opcional e não poderá bloquear o uso offline.
 
@@ -35,6 +60,7 @@ Não existe backend ou sincronização remota atualmente. Caso seja adicionada n
 - React Hook Form + Yup
 - Jest + ts-jest
 - `date-fns`
+- Victory Native (gráficos)
 - Expo FileSystem, DocumentPicker, Sharing, ImagePicker e Crypto
 
 ## Arquitetura
@@ -50,6 +76,7 @@ src/
 └── modules/
     ├── backup/
     ├── reports/
+    ├── statement-import/  parsers CSV, deduplicação e importação
     ├── transactions/
     └── user/
 ```
@@ -92,7 +119,7 @@ npm test
 npx tsc --noEmit
 ```
 
-A suíte atual cobre erros tipados, parcelamento, valores, datas, filtros, casos de uso de transações e formato/checksum do backup.
+A suíte atual cobre erros tipados, parcelamento, valores, datas, filtros, casos de uso de transações, formato/checksum do backup e importação de extratos (parsing, deduplicação e persistência).
 
 ## Backup e migração
 
@@ -102,6 +129,17 @@ Na primeira execução após a atualização, dados antigos do AsyncStorage são
 
 O backup ainda é um arquivo JSON legível e não possui criptografia de conteúdo. Essa política precisa ser definida antes de usar o recurso para dados altamente sensíveis.
 
+## Importação de faturas
+
+A aba **Importar** permite selecionar o banco de origem e escolher um arquivo CSV exportado pelo app do banco.
+
+| Banco   | Arquivo suportado        | Status      |
+|---------|--------------------------|-------------|
+| Nubank  | Fatura do cartão (CSV)   | Disponível  |
+| PicPay  | Extrato da conta (CSV)   | Em breve    |
+
+Transações importadas são gravadas como saídas com categoria padrão "Outros" e status "pago". A chave `(importSource, externalId)` impede duplicatas em reimportações do mesmo arquivo.
+
 ## Documentação
 
 A documentação técnica está em [`docs/`](docs/README.md), incluindo:
@@ -109,6 +147,7 @@ A documentação técnica está em [`docs/`](docs/README.md), incluindo:
 - arquitetura e estrutura de pastas;
 - fluxo de dados;
 - armazenamento e backup;
+- importação de extratos bancários;
 - estratégia de testes;
 - riscos e questões em aberto;
 - matriz de suporte de plataformas;
@@ -116,4 +155,4 @@ A documentação técnica está em [`docs/`](docs/README.md), incluindo:
 
 ## Status
 
-Projeto em evolução. A base offline-first, o armazenamento SQLite, a migração legada, os casos de uso de transações e os testes unitários estão implementados. Ainda estão planejados testes de integração nativa, execução completa da matriz Android/iOS e decisão sobre criptografia dos backups.
+Projeto em evolução (v1.3.0). A base offline-first, o armazenamento SQLite, a migração legada, os casos de uso de transações, a importação de faturas Nubank e os testes unitários estão implementados. Ainda estão planejados suporte ao PicPay, testes de integração nativa, execução completa da matriz Android/iOS e decisão sobre criptografia dos backups.
