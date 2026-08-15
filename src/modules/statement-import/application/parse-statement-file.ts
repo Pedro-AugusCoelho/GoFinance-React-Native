@@ -3,7 +3,8 @@ import { detectStatementProvider } from '../domain/detect-statement-provider'
 import { filterOutcomesOnly } from '../domain/filter-outcomes-only'
 import { ImportSource } from '../domain/import-source'
 import { parseNubankStatement } from '../domain/parse-nubank-statement'
-import { parsePicpayStatement } from '../domain/parse-picpay-statement'
+// PicPay desabilitado: fatura do cartão só disponível em PDF por enquanto.
+// import { parsePicpayStatement } from '../domain/parse-picpay-statement'
 import { StatementParseResult } from '../domain/statement-entry'
 
 export function parseStatementFile(
@@ -13,16 +14,17 @@ export function parseStatementFile(
     const detected = detectStatementProvider(content)
 
     if (expectedSource && detected !== expectedSource) {
-        const bankName = expectedSource === 'nubank' ? 'Nubank' : 'PicPay'
         throw new AppError(
             'STATEMENT_UNSUPPORTED_FORMAT',
-            `Este arquivo não parece ser um extrato ${bankName}. Selecione o banco correto ou outro arquivo.`,
+            'Este arquivo não parece ser uma fatura Nubank. Selecione o banco correto ou outro arquivo.',
         )
     }
 
-    const parsed = detected === 'nubank'
-        ? parseNubankStatement(content)
-        : parsePicpayStatement(content)
+    const parsed = parseNubankStatement(content)
+    // PicPay desabilitado: fatura do cartão só disponível em PDF por enquanto.
+    // const parsed = detected === 'nubank'
+    //     ? parseNubankStatement(content)
+    //     : parsePicpayStatement(content)
 
     return {
         ...parsed,

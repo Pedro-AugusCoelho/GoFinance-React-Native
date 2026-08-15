@@ -128,7 +128,7 @@ export function BottomTabsRoutes () {
                 name="Importar"
                 component={ImportStatement}
                 options={{
-                    tabBarButton: createTabButton('Importar extrato'),
+                    tabBarButton: createTabButton('Importar fatura'),
                     tabBarIcon: (({ size, color, focused }) =>
                         <TabIcon
                             name="upload-file"

@@ -27,7 +27,7 @@ export function BankImportCard({
             onPress={onPress}
             activeOpacity={0.7}
             accessibilityRole="button"
-            accessibilityLabel={`Importar extrato do ${name}`}
+            accessibilityLabel={`Importar do ${name}`}
             accessibilityHint={subtitle}
             testID={`bank-card-${importSource}`}
         >

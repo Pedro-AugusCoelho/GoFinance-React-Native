@@ -77,11 +77,11 @@ export function getErrorMessage(error: unknown, fallback = 'Não foi possível c
         case 'STATEMENT_FILE_READ_FAILED':
             return 'Não foi possível ler o arquivo selecionado.'
         case 'STATEMENT_UNSUPPORTED_FORMAT':
-            return appError.message || 'Este arquivo não é um extrato Nubank ou PicPay suportado.'
+            return appError.message || 'Este arquivo não parece ser uma fatura Nubank.'
         case 'STATEMENT_PARSE_FAILED':
-            return 'Não foi possível interpretar o extrato. Verifique o arquivo e tente novamente.'
+            return 'Não foi possível interpretar o arquivo. Verifique o arquivo e tente novamente.'
         case 'STATEMENT_IMPORT_FAILED':
-            return 'Não foi possível importar o extrato. Seus dados atuais foram preservados.'
+            return 'Não foi possível importar a fatura. Seus dados atuais foram preservados.'
         default:
             return appError.message || fallback
     }

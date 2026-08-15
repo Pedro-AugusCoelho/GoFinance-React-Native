@@ -81,3 +81,6 @@ BUILD.md
 # Editor/OS
 .vscode/
 Thumbs.db
+
+# Examples extracts
+examples_extracts/

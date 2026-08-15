@@ -21,15 +21,16 @@ const bankProviders = [
     {
         id: 'nubank' as const,
         name: 'Nubank',
-        subtitle: 'Importe apenas as saídas do extrato CSV da sua conta.',
+        subtitle: 'Importe os gastos da fatura do cartão em CSV.',
         importSource: 'nubank' as ImportSource,
     },
-    {
-        id: 'picpay' as const,
-        name: 'PicPay',
-        subtitle: 'Importe apenas as saídas do extrato CSV da sua conta.',
-        importSource: 'picpay' as ImportSource,
-    },
+    // PicPay desabilitado: fatura do cartão só disponível em PDF por enquanto.
+    // {
+    //     id: 'picpay' as const,
+    //     name: 'PicPay',
+    //     subtitle: 'Importe apenas as saídas do extrato CSV da conta.',
+    //     importSource: 'picpay' as ImportSource,
+    // },
 ]
 
 type TabNavigationProps = BottomTabNavigationProp<RootTabParamList>
@@ -45,7 +46,7 @@ export function ImportStatement() {
 
         Alert.alert(
             'Confirmar importação',
-            `${parsed.totalRows} linhas no arquivo.\n${newEntries.length} saídas novas.\n${parsed.ignoredIncomeCount} entradas ignoradas.\n${duplicateCount} duplicadas.`,
+            `${parsed.totalRows} linhas no arquivo.\n${newEntries.length} gastos novos.\n${parsed.ignoredIncomeCount} estornos ignorados.\n${duplicateCount} duplicadas.`,
             [
                 { text: 'Cancelar', style: 'cancel' },
                 {
@@ -64,7 +65,7 @@ export function ImportStatement() {
             const result = await importStatementEntries(parsed.entries, () => String(uuid.v4()))
             Alert.alert(
                 'Importação concluída',
-                `${result.importedCount} transações importadas, ${parsed.ignoredIncomeCount} ignoradas (entradas), ${result.duplicateCount} duplicadas.`,
+                `${result.importedCount} transações importadas, ${parsed.ignoredIncomeCount} ignoradas (estornos), ${result.duplicateCount} duplicadas.`,
                 [
                     {
                         text: 'OK',
@@ -73,7 +74,7 @@ export function ImportStatement() {
                 ],
             )
         } catch (error: unknown) {
-            Alert.alert('Erro', getErrorMessage(error, 'Não foi possível importar o extrato.'))
+            Alert.alert('Erro', getErrorMessage(error, 'Não foi possível importar a fatura.'))
         } finally {
             setIsLoading(false)
         }
@@ -83,6 +84,8 @@ export function ImportStatement() {
         if (isLoading) {
             return
         }
+
+        const fileLabel = 'fatura'
 
         setIsLoading(true)
         try {
@@ -98,7 +101,7 @@ export function ImportStatement() {
                 'Erro',
                 getErrorMessage(
                     error,
-                    `Este arquivo não parece ser um extrato ${bankName}. Selecione o banco correto ou outro arquivo.`,
+                    `Este arquivo não parece ser uma ${fileLabel} ${bankName}. Selecione o banco correto ou outro arquivo.`,
                 ),
             )
         } finally {
@@ -109,11 +112,11 @@ export function ImportStatement() {
     return (
         <S.Container>
             <S.Header>
-                <S.Title>Importar extrato</S.Title>
+                <S.Title>Importar fatura</S.Title>
             </S.Header>
             <S.Body>
                 <S.Intro>
-                    Selecione o banco de origem do arquivo CSV. Apenas saídas serão importadas.
+                    Selecione o banco de origem do arquivo CSV. Para o Nubank, use a fatura do cartão.
                 </S.Intro>
                 {bankProviders.map((bank) => (
                     <BankImportCard

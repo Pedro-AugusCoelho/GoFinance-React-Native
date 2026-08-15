@@ -1,4 +1,4 @@
-# Prompt de implementação: importação de extratos Nubank e PicPay
+# Prompt de implementação: importação de faturas Nubank e extratos PicPay
 
 ## Contexto do produto
 
@@ -12,32 +12,34 @@ Leia antes de implementar:
 - `docs/12-proposed-folder-structure.md` — onde colocar código novo
 - `docs/14-development-conventions.md` — TypeScript, AppError, testes
 - `docs/15-testing-strategy.md` — cobertura esperada
-- `examples_extracts/` — extratos reais de referência (Nubank e PicPay)
+- `examples_extracts/` — faturas e extratos reais de referência (Nubank e PicPay)
 
 ## Objetivo
 
-Implementar importação de extratos bancários em **CSV**, hoje para **Nubank** e **PicPay**, permitindo ao usuário selecionar um arquivo, visualizar uma prévia e importar **somente saídas** (`outcome`) como transações locais.
+Implementar importação de **fatura do cartão Nubank** e **extrato da conta PicPay** em **CSV**, permitindo ao usuário selecionar um arquivo, visualizar uma prévia e importar gastos como transações locais.
+
+A fatura do cartão Nubank é o formato preferido para registrar gastos reais (compras parceladas, estabelecimentos), em vez do extrato da conta corrente.
 
 Cada transação importada deve carregar um **identificador de origem** que permita saber de qual banco/app veio o gasto e evitar duplicatas em reimportações.
 
 ## Regra de negócio principal
 
-> **Importar apenas saídas. Nunca importar entradas**, seja Nubank ou PicPay.
+> **Importar apenas gastos (saídas). Nunca importar créditos ou estornos.**
 
-### Nubank
+### Nubank (fatura do cartão)
 
 Arquivo de referência: `examples_extracts/nubank/NU_379621784_01JUL2026_31JUL2026.csv`
 
 - Delimitador: vírgula
-- Cabeçalho: `Data,Valor,Identificador,Descrição`
-- **Incluir** linhas em que `Valor` é numérico e **estritamente negativo**
-- **Excluir** linhas em que `Valor` é positivo ou zero (entradas: transferências recebidas, resgates, créditos, etc.)
-- `name` = coluna `Descrição` (trim)
-- `date` = parse de `Data` (`DD/MM/YYYY`) via `parseTransactionDate`
-- `externalId` = coluna `Identificador` (UUID do banco)
+- Cabeçalho: `date,title,amount`
+- **Incluir** linhas em que `amount` é numérico e **estritamente positivo** (compras e parcelas)
+- **Excluir** linhas em que `amount` é negativo ou zero (estornos, créditos na fatura)
+- `name` = coluna `title` (trim) — inclui info de parcela, ex.: `Ec *Runningland - Parcela 1/2`
+- `date` = parse de `date` (`YYYY-MM-DD`) via `parseTransactionDate`
+- `externalId` = hash estável derivado de `date`, `title`, `amount` normalizado (fatura não expõe UUID)
 - `importSource` = `'nubank'`
 
-### PicPay
+### PicPay (extrato da conta)
 
 Arquivo de referência: `examples_extracts/picpay/extrato-2026-07-01-2026-07-31.csv`
 
@@ -98,7 +100,7 @@ Cada linha importada vira **uma** transação:
 **Conversão monetária:**
 
 - Reutilizar `parseTransactionValue` de `transaction-money.ts` onde couber
-- Nubank: `-3000.00` → `300000` centavos
+- Nubank: `145,89` → `14589` centavos
 - PicPay: `−R$ 36,96` → remover `R$`, tratar `−`, normalizar milhar e vírgula → centavos
 - Usar `roundCurrency` antes de converter para centavos
 
@@ -150,7 +152,7 @@ Adicionar uma **quinta aba** dedicada à importação de extratos, independente 
 |---|---|
 | Rota | `Importar` |
 | Componente | `ImportStatement` (tela hub de bancos) |
-| Label no long-press | `Importar extrato` |
+| Label no long-press | `Importar fatura` |
 | Ícone da tab | `upload-file` (`MaterialIcons`) |
 
 **Ícone da tab:** usar `upload-file`, que remete a envio/importação de arquivo CSV. Alternativa aceitável: `table-chart` (planilha). Manter o mesmo padrão das outras abas: componente `TabIcon` com animação de scale no foco, `tabBarShowLabel: false`, cores `theme.product.green_500` (ativo) e `theme.base.text` (inativo).
@@ -186,7 +188,7 @@ Tela inicial da aba **Importar**. Exibe uma lista de cards clicáveis — um por
 ```text
 ┌─────────────────────────────────────┐
 │  Header verde (#00875F)             │
-│  "Importar extrato"                 │
+│  "Importar fatura"                 │
 ├─────────────────────────────────────┤
 │  padding 24px                       │
 │                                     │
@@ -195,8 +197,8 @@ Tela inicial da aba **Importar**. Exibe uma lista de cards clicáveis — um por
 │                                     │
 │  ┌───────────────────────────────┐  │
 │  │ [logo]  Nubank                │  │
-│  │         Importe saídas do     │  │
-│  │         extrato CSV da conta  │  │
+│  │         Importe gastos da      │  │
+│  │         fatura do cartão CSV   │  │
 │  └───────────────────────────────┘  │
 │                                     │
 │  ┌───────────────────────────────┐  │
@@ -216,7 +218,7 @@ Seguir o padrão de `Profile` e `Resume`:
 
 - `background-color: theme.colors.primary` (`#00875F`)
 - Altura ~`RFValue(96)` com `getStatusBarHeight()`
-- Título centralizado: **"Importar extrato"**
+- Título centralizado: **"Importar fatura"**
 - `font-family: theme.fonts.regular`, `font-size: RFValue(18)`, cor `theme.base.white`
 
 #### Corpo
@@ -225,7 +227,7 @@ Seguir o padrão de `Profile` e `Resume`:
 - `padding: 24px` (igual `Profile`/`Dashboard`)
 - Texto introdutório opcional acima da lista:
   - `font-size: RFValue(14)`, `color: theme.colors.text`
-  - Ex.: *"Selecione o banco de origem do arquivo CSV. Apenas saídas serão importadas."*
+  - Ex.: *"Selecione o banco de origem do arquivo CSV. Para o Nubank, use a fatura do cartão."*
 
 #### Card de banco (`BankImportCard`)
 
@@ -267,14 +269,14 @@ const bankProviders = [
   {
     id: 'nubank',
     name: 'Nubank',
-    subtitle: 'Importe apenas as saídas do extrato CSV da sua conta.',
+    subtitle: 'Importe os gastos da fatura do cartão em CSV.',
     logo: require('../../../../assets/banks/nubank.png'),
     importSource: 'nubank' as const,
   },
   {
     id: 'picpay',
     name: 'PicPay',
-    subtitle: 'Importe apenas as saídas do extrato CSV do aplicativo.',
+    subtitle: 'Importe apenas as saídas do extrato CSV da conta.',
     logo: require('../../../../assets/banks/picpay.png'),
     importSource: 'picpay' as const,
   },
@@ -368,7 +370,7 @@ Mensagens amigáveis em `getErrorMessage`. Não logar conteúdo do extrato nem d
 
 Usar os arquivos em `examples_extracts/` como fixtures:
 
-1. **Nubank:** importa apenas linhas com `Valor < 0`; ignora transferências recebidas e resgates
+1. **Nubank:** importa apenas linhas com `amount > 0`; ignora estornos e créditos na fatura
 2. **PicPay:** importa apenas linhas com `−R$`; ignora `+R$`, Pix recebido e resgates de cofrinho
 3. **Detecção de provedor** pelo cabeçalho
 4. **Conversão monetária** PicPay (`−R$ 2.110,24` → `211024` centavos)
@@ -392,7 +394,7 @@ Rodar também `npx tsc --noEmit` e `npm test` antes de concluir.
 
 ### Técnico
 
-- [ ] CSV Nubank de `examples_extracts/nubank/` importa somente saídas
+- [ ] CSV Nubank de `examples_extracts/nubank/` importa gastos da fatura do cartão
 - [ ] CSV PicPay de `examples_extracts/picpay/` importa somente saídas
 - [ ] Cada transação importada tem `importSource` (`nubank` ou `picpay`) e `externalId`
 - [ ] Reimportar o mesmo arquivo não cria duplicatas
@@ -404,7 +406,7 @@ Rodar também `npx tsc --noEmit` e `npm test` antes de concluir.
 ### Interface
 
 - [ ] Nova aba **Importar** visível na bottom bar com ícone `upload-file`
-- [ ] Tela exibe cards de **Nubank** e **PicPay** com logo à esquerda, nome e subtítulo
+- [ ] Tela exibe cards de **Nubank** (fatura) e **PicPay** (extrato) com logo à esquerda, nome e subtítulo
 - [ ] Visual consistente com `TransactionCard`, `Profile` e tema claro/escuro
 - [ ] Toque no card abre seletor de CSV e valida banco correspondente
 - [ ] Prévia exibe contagem de importadas, ignoradas e duplicadas antes de confirmar
@@ -422,10 +424,11 @@ Rodar também `npx tsc --noEmit` e `npm test` antes de concluir.
 ## Prompt para o agente implementador
 
 ```
-Implemente a importação de extratos CSV do Nubank e PicPay no Plutora conforme docs/18-bank-statement-import-prompt.md.
+Implemente a importação de fatura CSV do Nubank e extrato PicPay no Plutora conforme docs/18-bank-statement-import-prompt.md.
 
 Requisitos inegociáveis:
-1. Importar SOMENTE saídas (outcome); nunca entradas.
+1. Nubank: importar SOMENTE gastos da fatura do cartão (amount > 0); nunca estornos/créditos.
+2. PicPay: importar SOMENTE saídas do extrato (outcome); nunca entradas.
 2. Persistir importSource ('nubank' | 'picpay') e externalId em cada transação importada.
 3. Deduplicar por (importSource, externalId).
 4. Seguir arquitetura offline-first: casos de uso fora das telas, parsers em domain/, DocumentPicker em storage/.
